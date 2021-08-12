@@ -63,6 +63,9 @@ export default function CreateUser() {
 
     const handleSubmitCreate = async (e) => {
         e.preventDefault(); 
+      if(password.trim().length<8){
+          alert("Contraseña demasiado corta")
+        } 
         if (email.trim() == "" || password.trim() == "" || name.trim() == ""  || last_name.trim() == "" ) {
           alert("No puede dejar campos vacios");
          }else{
