@@ -90,6 +90,10 @@ export default function Login() {
         .catch((error)=>{
           if(error=="Error: The password is invalid or the user does not have a password."){
             alert('Usuario y/o contraseña incorrectas, verifique su informacion')
+          }else{
+            if(error=="Error: The password is invalid or the user does not have a password."){
+              alert("La contraseña no cumple los requisitos")
+            }
           }
         })
     };
