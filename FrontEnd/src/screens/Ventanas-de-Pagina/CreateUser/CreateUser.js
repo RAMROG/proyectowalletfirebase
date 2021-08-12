@@ -80,6 +80,10 @@ export default function CreateUser() {
             if(e=="Error: The email address is already in use by another account."){
               alert("Usuario ya tiene una cuenta, registrada")
             }
+            if(e=="Error: The email address is badly formatted."){
+              alert("El email ingresado es incorrecto")
+            }
+            alert()
           })
          }
     };
