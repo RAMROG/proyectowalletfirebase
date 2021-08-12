@@ -63,7 +63,6 @@ export default function CreateUser() {
 
     const handleSubmitCreate = async (e) => {
         e.preventDefault(); 
-        if(password.length<4){alert("contraseña demasiado corta")}
         if (email.trim() == "" || password.trim() == "" || name.trim() == ""  || last_name.trim() == "" ) {
           alert("No puede dejar campos vacios");
          }else{
@@ -80,9 +79,14 @@ export default function CreateUser() {
           .catch(e=>{
             if(e=="Error: The email address is already in use by another account."){
               alert("Usuario ya tiene una cuenta, registrada")
-            }
-            if(e=="Error: The email address is badly formatted."){
-              alert("El email ingresado es incorrecto")
+            }else{
+              if(e=="Error: The email address is badly formatted."){
+                alert("El email ingresado es incorrecto")
+              }else{
+                if(e=="Error: Password should be at least 6 characters"){
+                  alert("Contraseña demasiado corta")
+                }
+              }
             }
           })
          }
