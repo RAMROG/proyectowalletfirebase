@@ -33,7 +33,7 @@ const LandingPage = () => {
                             <ul>
                                 <li><Link to="/#" className="active"><FontAwesomeIcon icon={['fa', 'home']}/> Inicio</Link></li>
                                 <li><Link to="/equipo"><FontAwesomeIcon icon={['fa', 'users']}/> Equipo</Link></li>
-                                <li><Link to="/create-user"><FontAwesomeIcon icon={['fa', 'align-justify']}/> Suscribete</Link></li>
+                                <li><Link to="/create-user"><FontAwesomeIcon icon={['fa', 'align-justify']}/> Crear Cuenta</Link></li>
                                 <li><Link to="/login"><FontAwesomeIcon icon={['fa', 'user']}/> Iniciar Sesion</Link></li>
                             </ul>
                             <i className="bi bi-list mobile-nav-toggle"></i>
@@ -185,5 +185,4 @@ const LandingPage = () => {
         </div>
     )
 }
-
 export default LandingPage

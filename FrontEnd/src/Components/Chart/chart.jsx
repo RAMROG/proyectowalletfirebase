@@ -27,7 +27,7 @@ export default function Chart(props) {
           <Tooltip />
           <Legend />
            <Line type="monotone" dataKey="mount" stroke="#8884d8" />
-           <Line type="monotone" dataKey="date_out" stroke="#8884d8" />
+           <Line type="monotone" dataKey="number_account" stroke="#8884d8" />
            </LineChart>)}
        
     </React.Fragment>

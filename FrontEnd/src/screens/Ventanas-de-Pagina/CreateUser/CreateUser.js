@@ -15,6 +15,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { Link } from 'react-router-dom';
+import { LaptopWindowsRounded } from '@material-ui/icons';
 
 const API = process.env.REACT_APP_API;
 
@@ -61,41 +62,26 @@ export default function CreateUser() {
     
 
     const handleSubmitCreate = async (e) => {
-        e.preventDefault();  
-        auth.createUserWithEmailAndPassword(email,password);
-        alert("Usuario Registrado");
-
-        //Validacion:
-        {/*
-        if (name.trim() != "" || last_name.trim() != "" || email.trim() != "" || password.trim() != "" ) {
-        
-            const json_data = {
-                'name': name,
-                'last_name': last_name,
-                'email': email,
-                'password': password
-            };
-
-            const res = await fetch(`${API}/create-user`, {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify(json_data),
-            });
-
-            const data = await res.json();
-            if (data.result == true){
-                history.push({
-                    pathname: './Authentication',
-                    state: { mail: email }
-                  });
+        e.preventDefault(); 
+        if (email.trim() == "" || password.trim() == "" || name.trim() == ""  || last_name.trim() == "" ) {
+          alert("No puede dejar campos vacios");
+         }else{
+          await auth.createUserWithEmailAndPassword(email,password)
+          .then(f=>{
+            let use=auth.currentUser;
+            use.sendEmailVerification()
+            .then(f=>{
+              alert("Revise su correo, se envio el enlace para que verifique");
+              window.location='/login';
+            })
+          }  
+          )
+          .catch(e=>{
+            if(e=="Error: The email address is already in use by another account."){
+              alert("Usuario ya tiene una cuenta, registrada")
             }
-            else{
-                alert("Usuario o contraseña no permitidos");
-            }
-        }
-        else{
-            alert("no puede dejar campos vacios");
-        }*/}
+          })
+         }
     };
 
   return (
@@ -106,7 +92,7 @@ export default function CreateUser() {
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          Sign up
+          Crear Usuarios
         </Typography>
         <form className={classes.form} noValidate>
           <Grid container spacing={2}>
@@ -177,15 +163,12 @@ export default function CreateUser() {
           >
             Crear Usuario
           </Button>
-
-          <Grid container justifyContent="flex-end">
-            <Grid item>
-              <Link to="/login" variant="body2" >
-                Ya tienes cuenta? Inicia Sesion
-              </Link>
-            </Grid>
-          </Grid>
-          
+          <Link to="/login" variant="body2" >
+                <p>Ya tienes cuenta? Inicia Sesion</p>
+          </Link>
+          <Link to="/" variant="body2" >
+                <p>Volver a la pagina Principal</p>
+          </Link>
         </form>
       </div>
       <Box mt={5}>

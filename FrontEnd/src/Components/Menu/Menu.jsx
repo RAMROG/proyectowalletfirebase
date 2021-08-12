@@ -10,12 +10,9 @@ import List from '@material-ui/core/List';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
-import Badge from '@material-ui/core/Badge';
-//import Link from '@material-ui/core/Link';
+
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import NotificationsIcon from '@material-ui/icons/Notifications';
-import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import { Link } from 'react-router-dom';
 
 import ListItem from '@material-ui/core/ListItem';
@@ -28,11 +25,7 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import LayersIcon from '@material-ui/icons/Layers';
 
-import MenuItem from '@material-ui/core/MenuItem';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import DraftsIcon from '@material-ui/icons/Drafts';
-import SendIcon from '@material-ui/icons/Send';
-import { Button, Fade } from '@material-ui/core';
+
 import{auth} from '../../firebaseconf'
 const drawerWidth = 240;
 
@@ -128,8 +121,6 @@ export default function Menu() {
   const obtenerDatos = async () => {
     await auth.onAuthStateChanged((z)=>{if(z){
       setEmail(z.email);
-    }else{
-        alert("error")
     }
   })
     }
@@ -138,14 +129,6 @@ export default function Menu() {
       obtenerDatos();
     }, []);
   
-
-  const seleccionarUsuarios = (id) => {
-    console.log('Usuario seleccionado ==> ', id)
-  }
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
   const handleDrawerOpen = () => {
@@ -158,10 +141,15 @@ export default function Menu() {
   const cerrarSesion = async (e) => {
     e.preventDefault();
     localStorage.clear();
-    window.location.href = "http://localhost:3000/login";
+    auth.onAuthStateChanged(e=>{
+      if(e){ 
+        auth.signOut();
+      }else{
+      }
+    })
+    window.location="/";
   };
 
-  const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
   return (
     <div>
       <CssBaseline />
@@ -189,25 +177,8 @@ export default function Menu() {
               </a>
 
               <div className="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                {/*
-                  users.map(user => {
-                    return (
-                      <a onClick={() => seleccionarUsuarios(user.id)} className="dropdown-item" href="#">{user.nombre}</a>
-                    )
-                  })
-                */}
-
               </div>
             </div>
-
-            {/* <Button
-              aria-controls="customized-menu"
-              aria-haspopup="true"
-              variant="contained"
-              color="primary"
-            >
-              <AccountCircleIcon fontSize="medium" />
-            </Button> */}
           </IconButton>
         </Toolbar>
       </AppBar>
@@ -217,6 +188,7 @@ export default function Menu() {
           paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose),
         }}
         open={open}
+        style={{height:"100vh"}}
       >
         <div className={classes.toolbarIcon}>
           <IconButton onClick={handleDrawerClose}>

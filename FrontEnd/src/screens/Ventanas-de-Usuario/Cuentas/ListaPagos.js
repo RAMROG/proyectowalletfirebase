@@ -203,7 +203,7 @@ const ListaPagos = () => {
                                                     datosPagos.length>0 ?
                                                     (datosPagos.map((row, key) => (
                                                         <TableRow key={key}>
-                                                            <TableCell component="rigth" scope="row">{key++}</TableCell>
+                                                            <TableCell component="rigth" scope="row">{++key}</TableCell>
                                                             <TableCell align="right">{row.nombrePago}</TableCell>
                                                             <TableCell align="right">{row.monto}</TableCell>
                                                             <TableCell align="right">{row.categoria}</TableCell>

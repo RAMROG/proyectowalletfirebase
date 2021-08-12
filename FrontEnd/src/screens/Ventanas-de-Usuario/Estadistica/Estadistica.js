@@ -91,9 +91,9 @@ const useStyles = makeStyles((theme) => ({
 const Estadistica = () => {
     const classes = useStyles();
     const idUsuario = localStorage.getItem("Session_id");
-    const [cuentas,setCuentas]=useState([])
     const [data, setData] = useState([]);
     const [datosPagos, setPagos] = useState({});
+    const [datosCuentas, setCuentas] = useState({});
 
     const obtenerPagos = async () => {
       await auth.onAuthStateChanged((z)=>{if(z){
@@ -113,10 +113,29 @@ const Estadistica = () => {
       }})
           }
 
+          const obtenerCuentas = async () => {
+            await auth.onAuthStateChanged((z)=>{if(z){
+                const data= async()=>{
+                    await database.ref().child(z.uid).child('cuentas').on('value',(e)=>{
+                    const todo=[];
+                    const da= e.forEach(element => {
+                        todo.push(element.val())
+                    });
+                    if(todo.length>0){
+                        setCuentas(todo);
+                      }   
+                })}
+                data();
+            }else{
+                alert("error")
+            }})
+                }
+
   
  
     useEffect(() => {
       obtenerPagos();
+      obtenerCuentas();
     }, []);
 
     return (
@@ -136,7 +155,19 @@ const Estadistica = () => {
             </Grid>):
             (<Grid item xs={12} md={8} lg={12}>
               <Paper >
-                <p style={{color:"red"}}>Lo sentimos no se puede acceder a la informacion, recargue la pagina</p>
+                <p> No cuenta con registros en su cuenta para visualizar graficos, cree cuentas y pagos para poder ver la grafica</p>
+              </Paper>
+          </Grid>)}
+
+          {datosCuentas.length>0 ? 
+          (<Grid item xs={12} md={8} lg={12}>
+                <Paper className={classes.fixedHeightPaper}>
+                  <Chart data={datosCuentas} title="Cuentas Bancarias"/>
+                </Paper>
+            </Grid>):
+            (<Grid item xs={12} md={8} lg={12}>
+              <Paper >
+                <p>No cuenta con registros en su cuenta para visualizar graficos, cree cuentas y pagos para poder ver la grafica </p>
               </Paper>
           </Grid>)}
             

@@ -1,9 +1,10 @@
-import React from 'react';
+import React, {useEffect,useState}from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import { Fragment } from 'react';
+import {auth,database} from '../../firebaseconf';
 
 const UseStyles = makeStyles({
   root: {
@@ -25,6 +26,32 @@ const UseStyles = makeStyles({
 export default function Deposits(props) {
   const classes = UseStyles();
   const bull = <span className={classes.bullet}>•</span>;
+  const [datosPagos, setPagos] = useState();
+  
+  
+  const obtenerPagos = async ()=> {
+     await auth.onAuthStateChanged((z)=>{if(z){
+        const data= async()=>{
+            await database.ref().child(z.uid).child('Pagos').on('value',(e)=>{
+            const todo=0.0;
+            if (e.length>0){
+              e.map(item=>{
+                todo+=item.monto;
+              })
+            }
+            alert("entro")
+            if(todo>=0){
+                setPagos(todo);
+              }   
+        })}
+        data()
+    }else{
+        alert("error")
+    }})
+        }
+  useEffect(() => {
+    obtenerPagos();
+    }, [])
 
   return (
     <React.Fragment>
@@ -33,14 +60,10 @@ export default function Deposits(props) {
         <Typography className={classes.title} color="textSecondary" gutterBottom>
         {props.title}
         </Typography>
-        {props.money.length>0 ? (
         <Typography variant="h5" component="h2">
-          L {props.money}
-        </Typography>):
-        (<p style={{color:"red"}}>Lo sentimos, no se puede acceder a la informacion, recargue la pagina</p>)}
-        
+        </Typography>
         <Typography className={classes.pos} color="textSecondary">
-          Movimiento
+          Movimiento {datosPagos}
         </Typography>
         <Typography variant="body2" component="p">
           Este es el resumen de:

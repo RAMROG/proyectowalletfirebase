@@ -8,6 +8,8 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Title from '../Title/title';
+import Button from '@material-ui/core/Button';
+import { auth,database } from '../../firebaseconf';
 
 
 const API = process.env.REACT_APP_API;
@@ -27,66 +29,141 @@ export default function Movlist() {
   const session_id = localStorage.getItem("Session_id");
   const classes = UseStyles();
   const [movimientos, setMovimientos]=useState([]);
+  const [datosCuentas, setCuentas] = useState({});
+  let suma=0.0;
+  const [sumaCuentas,setsuma]=useState(0);
+  const [datosPagos, setPagos] = useState({});
 
-  const dataMovimientos = async () => {
-    const json_data = {
-        'id_user' : session_id        
-      };
-      const res = await fetch(`${API}/get-movimientos-recientes`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(json_data),
-      });
+  const styles = (theme) => ({
+    root: {
+        margin: 0,
+        padding: theme.spacing(2),
+    },
+    closeButton: {
+        position: 'absolute',
+        right: theme.spacing(1),
+        top: theme.spacing(1),
+        color: theme.palette.grey[500],
+    },
+    textField: {
+        marginLeft: theme.spacing(1),
+        marginRight: theme.spacing(1),
+        width: 400,
+    },
+    table: {
+        minWidth: 650,
+    },
+});
 
-      const data = await res.json();
+  const obtenerCuentas = async () => {
+    await auth.onAuthStateChanged((z)=>{if(z){
+        const data= async()=>{
+            await database.ref().child(z.uid).child('cuentas').on('value',(e)=>{
+            const todo=[];
+            const da= e.forEach(element => {
+                todo.push(element.val())
+            });
+            if(todo.length>0){
+                setCuentas(todo);
+              }   
+        })}
+        data();
+    }else{
+        alert("error")
+    }})
+        }
 
-      if (data) {
-        //console.log(data)
-        setMovimientos(data);
-      }else{
-        console.log("error al mandar informacion")
-      }
-  };
+
+        const obtenerPagos = async () => {
+          await auth.onAuthStateChanged((z)=>{if(z){
+              const data= async()=>{
+                  await database.ref().child(z.uid).child('Pagos').on('value',(e)=>{
+                  const todo=[];
+                  const da= e.forEach(element => {
+                      todo.push(element.val())
+                  });
+                  if(todo.length>0){
+                      setPagos(todo);
+                    }   
+              })}
+              data();
+          }else{
+              alert("error")
+          }})
+              }
+
   useEffect(() => {
-    dataMovimientos();
+    obtenerCuentas();
+    obtenerPagos();
   }, [])
 
 
   return (
     <React.Fragment>
-      <Title align="center">Movimientos recientes</Title>
+      <Title align="center">Cuentas de Usuario</Title>
       <Table size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell>#</TableCell>
-            <TableCell>nombre</TableCell>
-            <TableCell>categoria</TableCell>
-            <TableCell>monto</TableCell>
-            <TableCell align="right">fecha y hora</TableCell>
-          </TableRow>
-        </TableHead>
+      <TableHead>
+             <TableRow>
+                 <TableCell color="primary" align="right">#</TableCell>
+                  <TableCell color="primary" align="right">Nombre del banco</TableCell>
+                  <TableCell color="primary" align="right">Numero Cuenta</TableCell>
+                  <TableCell color="primary" align="right">Tipo cuenta</TableCell>
+                  <TableCell color="primary" align="right">Monto</TableCell>
+                  </TableRow>
+              </TableHead>
         <TableBody>
-
-         {movimientos.length>0 ?
-         ( movimientos.map((item) => (
-          <TableRow key={item.id}>
-            <TableCell>{item.id}</TableCell>
-            <TableCell>{item.descripcion}</TableCell>
-            <TableCell>{item.categoria}</TableCell>
-            <TableCell>{item.mount}</TableCell>
-            <TableCell align="right">{item.date_trans}</TableCell>
-          </TableRow>
-        )))
-         :
-         (<TableRow>
-              <TableCell style={{color:"red"}}>No tienes movimientos recientes para visualizar, o actualiza la pagina</TableCell>
-         </TableRow>) } 
+        {
+            datosCuentas.length>0 ?
+            (datosCuentas.map((row, key) => (
+              <TableRow key={key}>
+                <TableCell component="rigth" scope="row">{++key}</TableCell>
+                           <TableCell align="right">{row.name_bank_account}</TableCell>
+                           <TableCell align="right">{row.number_account}</TableCell>
+                            <TableCell align="right">{row.type_bank}</TableCell>
+                            <TableCell align="right">{row.mount}</TableCell>
+                            <TableCell align="right">
+                            </TableCell>
+                </TableRow>
+                              ))):
+            (console.log(' no existe data'))}
         </TableBody>
       </Table>
+      <Title align="center"></Title>
+      <Title align="center">Pagos Realizados</Title>
+      <Table className={styles.table} size="small" aria-label="a dense table">
+                                                <TableHead>
+                                                    <TableRow>
+                                                        <TableCell color="primary" align="right">#</TableCell>
+                                                        <TableCell color="primary" align="right">Nombre</TableCell>
+                                                        <TableCell color="primary" align="right">Monto</TableCell>
+                                                        <TableCell color="primary" align="right">Categoria</TableCell>
+                                                        <TableCell color="primary" align="right">Descripcion</TableCell>
+                                                    </TableRow>
+                                                </TableHead>
+                                                <TableBody>
+                                                {
+                                                    datosPagos.length>0 ?
+                                                    (datosPagos.map((row, key) => (
+                                                        <TableRow key={key}>
+                                                            <TableCell component="rigth" scope="row">{key++}</TableCell>
+                                                            <TableCell align="right">{row.nombrePago}</TableCell>
+                                                            <TableCell align="right">{row.monto}</TableCell>
+                                                            <TableCell align="right">{row.categoria}</TableCell>
+                                                            <TableCell align="right">{row.descripccion}</TableCell>
+                                                            <TableCell align="right">
+                                                            </TableCell>
+                                                        </TableRow>
+                                                     ))):
+                                                    (console.log(' no existe data'))}
+                                                </TableBody>
+                          
+                                            </Table>
+                                            <Link to='/cuentas'>
+                                                    <p>Ir a crear cuentas y pagos nuevos</p>
+                                                </Link>
+      
+      
       <div className={classes.seeMore}>
-        <Link color="primary" to="/#" onClick={preventDefault}>
-          See more orders
-        </Link>
       </div>
     </React.Fragment>
   );

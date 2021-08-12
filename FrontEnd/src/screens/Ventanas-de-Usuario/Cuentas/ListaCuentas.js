@@ -13,7 +13,7 @@ import Paper from '@material-ui/core/Paper';
 import Menu from '../../../Components/Menu/Menu';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import Cuentas from './Cuentas';
+
 
 const API = process.env.REACT_APP_API;
 const drawerWidth = 240;
@@ -125,17 +125,6 @@ const ListaCuentas = () => {
         },
     });
 
-let cuen={};
-   /*const obtenerCuentas = async () => {
-
-        const data=await database.ref().child('user').child('metas')
-        data.on('value',(e)=>{
-            cuen= e.val();
-            alert(cuen);
-            setCuentas(cuen);
-            alert(datosCuentas) 
-        })
-        }*/
     const obtenerCuentas = async () => {
         await auth.onAuthStateChanged((z)=>{if(z){
             const data= async()=>{
@@ -209,7 +198,7 @@ let cuen={};
                                                     datosCuentas.length>0 ?
                                                     (datosCuentas.map((row, key) => (
                                                         <TableRow key={key}>
-                                                            <TableCell component="rigth" scope="row">{key++}</TableCell>
+                                                            <TableCell component="rigth" scope="row">{++key}</TableCell>
                                                             <TableCell align="right">{row.name_bank_account}</TableCell>
                                                             <TableCell align="right">{row.number_account}</TableCell>
                                                             <TableCell align="right">{row.type_bank}</TableCell>

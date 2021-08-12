@@ -25,7 +25,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { DialogContentText, Modal } from '@material-ui/core';
 
-const API = process.env.REACT_APP_API;
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -131,8 +130,8 @@ const MetasPlanes = () => {
         const json_data = {
             name_meta : nameMeta,
             descripcion_meta: descripcionMeta,
-            date_inicio: date_init,
-            date_final: date_final,
+            date_inicio: `${date_init}`,
+            date_final: `${date_final}`,
             monto_meta: montoMeta,
             categorie: tipoCategoria,
         }; 
@@ -141,8 +140,8 @@ const MetasPlanes = () => {
                 setuser(usuario.uid)
             }})
                 
-                    const data=await database.ref().child(iduser).child('Metas').push(json_data);
-                    window.location='/metas-planes';
+            const data=await database.ref().child(iduser).child('Metas').push(json_data);
+            window.location='/metas-planes';
                    
                 }catch(e){
                         alert("intente enviar de nuevo, se perdio la conexion");
@@ -214,32 +213,8 @@ const MetasPlanes = () => {
             alert("error")
         }})
             }
-    const informacionCategoria = async () => {
-        const res = await fetch(`${API}/`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(),
-        });
-        const data = await res.json();
-        if (data) {
-            setDataCategoria(data);
-        }
-    }
-    const obtenerCuentas = async () => {
-        const json_data = {
-            //verificar que el valor entre comillas sea igual al de la base por favor
-            'id_user': idUsuario
-        };
-        const res = await fetch(`${API}/`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(json_data),
-        });
-        const data = await res.json();
-        if (data) {
-            setCuentas(data);
-        }
-    }
+
+
     const handleCloseMetas = () => {
         setOpenMetas(false);
     }
@@ -248,37 +223,8 @@ const MetasPlanes = () => {
     }
     useEffect(() => {
         obtenerMetas();
-        informacionCategoria();
-        obtenerCuentas();
     }, [])
 
-    const [errorLlenado, handleError] = useState(false);
-
-    const EliminarMeta = async (e) => {
-        const json_data = {
-            'id_user': idUsuario
-        };
-
-        const res = await fetch(`${API}/`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(json_data),
-        });
-
-        if (res.status) {
-            //const data = await res.json();
-            console.log("==========================Meta eliminada ==============================");
-        };
-    };
-
-    const body = (
-        <div >
-            <h2 id="simple-modal-title">Text in a modal</h2>
-            <p id="simple-modal-description">
-                Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-            </p>
-        </div>
-    );
 
     return (
         <div className={classes.root}>
@@ -346,8 +292,6 @@ const MetasPlanes = () => {
                 </Container>
             </main>
 
-
-            { /* MODAL METAS */}
 
             <Dialog onClose={handleCloseMetas} open={openMetas}>
                 <DialogTitle onClose={handleCloseMetas}>
@@ -422,13 +366,6 @@ const MetasPlanes = () => {
                         <MenuItem key={2} value={"Servicios Publicos"}>Servicios Publicos</MenuItem>
                         <MenuItem key={3} value={"Servicios Publicos"}>Otros</MenuItem>
                     </TextField>
-
-
-                    {errorLlenado ? (
-                        <Typography gutterBottom>
-                            Todos los campos deben ser llenados
-                        </Typography>
-                    ) : null}
 
                 </DialogContentText>
                 <DialogActions>

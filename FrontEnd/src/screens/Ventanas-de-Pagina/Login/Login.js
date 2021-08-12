@@ -58,63 +58,43 @@ export default function Login() {
   const classes = useStyles();
 
   const [email, setEmail] = useState("");
+  const [nameUser, setNameUser] = useState("");
+  const [idUser, setIdUser] = useState("");
   const [password, setPassword] = useState("");
-  const [user,setUser]=useState({})
+  const [user,setUser]=useState("");
+  const [verifica,setVerifica]=useState("");
+
   const handleSubmit = async (e) => {
         e.preventDefault();  
         if (email.trim() == "" || password.trim() == "") {
             alert("No puede dejar campos vacios");
         }
         else{
-
-          auth.signInWithEmailAndPassword(email,password)
-         .then(window.location = '/dashboard')
-
-            /*const json_data = {
-                'email': email,
-                'password':password
-            };
-
-            const res = await fetch(`${API}/login`, {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify(json_data),
-            });
-
-            const data = await res.json();
-            
-             @data["Session"] devuelve 4 posibles valores
-                1: Session iniciada correctamente
-                2: El email no ha sido verificado
-                3: la contraseña es incorrecta
-                4: este correo no existe en los registros
-            
-            if (data["Session"] == 1){
-                //Session inciada
-                localStorage.setItem('Session_email', data["Data"][0].email);
-                localStorage.setItem('Session_name', data["Data"][0].name);
-                localStorage.setItem('Session_id', data["Data"][0].id);
-                window.location.href = "http://localhost:3000/dashboard";
-            }
-            else if (data["Session"] == 2){
-                //El email no se ha verificado, redirigir a la pagina de validacion
-                history.push({
-                  pathname: './Authentication',
-                  state: { mail: email }
-                });
-            }
-            else if (data["Session"] == 3){
-                alert("Contraseña incorrecta");
-            }
-            else if (data["Session"] == 4){                
-                alert("Este correo no esta registrado");
-            }
-            else{
-                alert("Problemas en el servidor");
-            }*/
-        }
+        await auth.signInWithEmailAndPassword(email,password)
+         .then(e=>{
+           auth.onAuthStateChanged((user)=>{
+              setIdUser(user.uid);
+              setNameUser(user.displayName);
+              setVerifica (user.emailVerified);
+              if(user.emailVerified){
+                window.location='/dashboard'
+              }else{
+                alert('su cuenta no esta verificada, revise su correo electronico')
+              }
+           })
+          localStorage.setItem('Session_email', email);
+          localStorage.setItem('Session_name', nameUser);
+          localStorage.setItem('Session_id', idUser);
+          localStorage.setItem('verficacion',verifica); 
+        })
+        .catch((error)=>{
+          if(error=="Error: The password is invalid or the user does not have a password."){
+            alert('Usuario y/o contraseña incorrectas, verifique su informacion')
+          }
+        })
     };
-  
+  }
+
     return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -123,7 +103,7 @@ export default function Login() {
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          Sign in
+          Inicio de Sesion
         </Typography>
         <form className={classes.form} noValidate>
           <TextField
@@ -167,7 +147,10 @@ export default function Login() {
           <Grid container>
             <Grid item>
               <Link to="/create-user" variant="body2">
-                {"No tienes cuenta? Crear usuario"}
+                <p>No tienes cuenta? Crear usuario</p>
+              </Link>
+              <Link to="/" variant="body2">
+                <p>volver a pagina principal</p>
               </Link>
             </Grid>
           </Grid>
