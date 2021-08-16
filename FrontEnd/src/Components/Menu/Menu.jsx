@@ -26,7 +26,7 @@ import BarChartIcon from '@material-ui/icons/BarChart';
 import LayersIcon from '@material-ui/icons/Layers';
 
 
-import{auth} from '../../firebaseconf'
+import { auth, db } from '../../firebaseconf'
 const drawerWidth = 240;
 
 
@@ -112,23 +112,46 @@ const useStyles = makeStyles((theme) => ({
 export default function Menu() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [openMenu, setopenMenu] = useState(false)
-  const [email,setEmail]=useState('')
+  const [email, setEmail] = useState('');
+  const [avatares, setAvatares] = useState([])
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
   const obtenerDatos = async () => {
-    await auth.onAuthStateChanged((z)=>{if(z){
-      setEmail(z.displayName);
-    }
-  })
-    }
+    await auth.onAuthStateChanged((z) => {
+      if (z) {
+        setEmail(z.displayName);
+      }
+    })
+  }
 
-    useEffect(() => {
-      obtenerDatos();
-    }, []);
-  
+  const obtenerAvatares = () => {
+    try {
+      const response = db.collection('nombreColeccion').get();
+      let data = [];
+
+      response.forEach(user => {
+        data.push({
+          id: user.id,
+          ...user.data()
+        });
+      });
+
+      setAvatares(data);
+
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+
+  useEffect(() => {
+    obtenerDatos();
+    obtenerAvatares();
+  }, []);
+
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
   const handleDrawerOpen = () => {
@@ -141,8 +164,8 @@ export default function Menu() {
   const cerrarSesion = async () => {
     localStorage.clear();
     await auth.signOut()
-    .then(window.location="/")
-    .catch()
+      .then(window.location = "/")
+      .catch()
   };
 
   return (
@@ -161,7 +184,7 @@ export default function Menu() {
           </IconButton>
           <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
             {
-              setEmail.length>0?(<p>Bienvenido a Wallet {email}</p>):(<p>Wallet</p>)
+              setEmail.length > 0 ? (<p>Bienvenido a Wallet {email}</p>) : (<p>Wallet</p>)
             }
           </Typography>
           <IconButton color="inherit">
@@ -172,6 +195,24 @@ export default function Menu() {
               </a>
 
               <div className="dropdown-menu" aria-labelledby="dropdownMenuLink">
+
+                {
+
+                  avatares.map(user => {
+                    return (
+                      <div className="row" >
+                        <div className="col-3" >
+                          <img className="img-fluid rounded-circle m-1" height="30px" width="30px" src={user.photoURL} alt="img-foto" />
+                        </div>
+                        <div className="col-9" >
+                          <p className="m-1" >{user.displayName}</p>
+                        </div>
+                      </div>
+                    )
+                  })
+
+                }
+
               </div>
             </div>
           </IconButton>
@@ -183,7 +224,7 @@ export default function Menu() {
           paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose),
         }}
         open={open}
-        style={{height:"100vh"}}
+        style={{ height: "100vh" }}
       >
         <div className={classes.toolbarIcon}>
           <IconButton onClick={handleDrawerClose}>
