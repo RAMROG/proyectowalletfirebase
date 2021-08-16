@@ -406,7 +406,7 @@ const Configuracion = () => {
                                                         <TextField
                                                             style={{ width: '100%' }}
                                                             id="standard-multiline-flexible"
-                                                            label="Ciudad"
+                                                            label="Pais"
                                                             multiline
                                                             maxRows={4}
                                                             value={pais}

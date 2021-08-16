@@ -131,6 +131,7 @@ const Cuentas = () => {
 
         const json_data = {
             //id_user : idUsuario,
+            
             name_bank_account : nombreBanco,
             date_out: fechaVencimiento,
             validation_digits: csv,
@@ -139,18 +140,16 @@ const Cuentas = () => {
             type_bank : tipoCuenta
         };
         try{
-        await auth.onAuthStateChanged((usuario)=>{if(usuario){
-            setuser(usuario.uid)
-        }})
-            
-                const data=await database.ref().child(iduser).child('cuentas').push(json_data);
-                window.location='/cuentas';
+            await auth.onAuthStateChanged((z)=>{if(z){
+                database.ref(`/${z.uid}/cuentas/`).push(json_data)
+                .then(setOpenModalCuentas(false))
+                    }})
                
             }catch(e){
-                    alert("intente enviar de nuevo, se perdio la conexion");
+               
+                alert(e)
                 }
     };
-
 
     const handleSubmitPagos = async (e) => {
         e.preventDefault();
@@ -163,15 +162,14 @@ const Cuentas = () => {
             categoria: categoriaPago
         };
         try{
-        await auth.onAuthStateChanged((usuario)=>{if(usuario){
-            setuser(usuario.uid)
-        }})
-            
-                const data=await database.ref().child(iduser).child('Pagos').push(json_data);
-                window.location='/cuentas';
+            await auth.onAuthStateChanged((z)=>{if(z){
+                database.ref(`/${z.uid}/Pagos/`).push(json_data)
+                .then(setOpenModalPagos(false))
+                    }})
                
             }catch(e){
-                    alert("intente enviar de nuevo, se perdio la conexion");
+               
+                alert(e)
                 }
     };
 

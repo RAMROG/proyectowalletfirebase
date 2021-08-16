@@ -120,7 +120,7 @@ export default function Menu() {
 
   const obtenerDatos = async () => {
     await auth.onAuthStateChanged((z)=>{if(z){
-      setEmail(z.email);
+      setEmail(z.displayName);
     }
   })
     }
@@ -138,16 +138,11 @@ export default function Menu() {
     setOpen(false);
   };
 
-  const cerrarSesion = async (e) => {
-    e.preventDefault();
+  const cerrarSesion = async () => {
     localStorage.clear();
-    auth.onAuthStateChanged(e=>{
-      if(e){ 
-        auth.signOut();
-      }else{
-      }
-    })
-    window.location="/";
+    await auth.signOut()
+    .then(window.location="/")
+    .catch()
   };
 
   return (

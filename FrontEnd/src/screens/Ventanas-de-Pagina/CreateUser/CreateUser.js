@@ -69,6 +69,7 @@ export default function CreateUser() {
           await auth.createUserWithEmailAndPassword(email,password)
           .then(f=>{
             let use=auth.currentUser;
+            use.updateProfile({displayName:name+last_name})
             use.sendEmailVerification()
             .then(f=>{
               alert("Revise su correo, se envio el enlace para que verifique");

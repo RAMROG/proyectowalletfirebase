@@ -130,22 +130,21 @@ const MetasPlanes = () => {
         const json_data = {
             name_meta : nameMeta,
             descripcion_meta: descripcionMeta,
-            date_inicio: `${date_init}`,
-            date_final: `${date_final}`,
+            date_inicio: date_init,
+            date_final: date_final,
             monto_meta: montoMeta,
             categorie: tipoCategoria,
         }; 
         try{
-            await auth.onAuthStateChanged((usuario)=>{if(usuario){
-                setuser(usuario.uid)
-            }})
-                
-            const data=await database.ref().child(iduser).child('Metas').push(json_data);
-            window.location='/metas-planes';
-                   
-                }catch(e){
-                        alert("intente enviar de nuevo, se perdio la conexion");
-                    }
+            await auth.onAuthStateChanged((z)=>{if(z){
+                database.ref(`/${z.uid}/Metas/`).push(json_data)
+                .then(handleCloseMetas)
+                    }})
+               
+            }catch(e){
+               
+                alert(e)
+                }
     };
 
     const styles = (theme) => ({
@@ -196,15 +195,18 @@ const MetasPlanes = () => {
         },
     }))(MuiDialogActions);
 
+
     const obtenerMetas = async () => {
         await auth.onAuthStateChanged((z)=>{if(z){
             const data= async()=>{
                 await database.ref().child(z.uid).child('Metas').on('value',(e)=>{
                 const todo=[];
-                const da= e.forEach(element => {
-                    todo.push(element.val())
-                });
-                if(todo.length>0){
+                const todos=e.val();
+                for(let id in  todos){
+                    todo.push({id,...todos[id]})
+                }
+                console.log(todo)
+                if(todo.length>=0){
                     setDatosMetas(todo);
                   }   
             })}
@@ -213,6 +215,19 @@ const MetasPlanes = () => {
             alert("error")
         }})
             }
+
+            const eliminarMetas = async (id) => { 
+                try{
+                    await auth.onAuthStateChanged((z)=>{if(z){
+                    database.ref(`/${z.uid}/Metas/${id}`).remove()
+                    .then(obtenerMetas())
+                    }})
+                    }catch(e){
+                        console.log(e);
+                        }
+                    }
+
+    
 
 
     const handleCloseMetas = () => {
@@ -261,7 +276,7 @@ const MetasPlanes = () => {
                                                     datosMetas.length>0 ?
                                                     (datosMetas.map((row, key) => (
                                                         <TableRow key={key}>
-                                                            <TableCell component="rigth" scope="row">{key++}</TableCell>
+                                                            <TableCell component="rigth" scope="row">{++key}</TableCell>
                                                             <TableCell align="right">{row.name_meta}</TableCell>
                                                             <TableCell align="right">{row.date_inicio}</TableCell>
                                                             <TableCell align="right">{row.date_final}</TableCell>
@@ -269,7 +284,7 @@ const MetasPlanes = () => {
                                                             <TableCell align="right">{row.categorie}</TableCell>
                                                             <TableCell align="right">{row.descripcion_meta}</TableCell>
                                                             <TableCell align="right">
-                                                            <Button size="small" style={{ backgroundColor: '#e53935', color: '#fff' }} >Eliminar</Button>
+                                                            <Button size="small" onClick ={(id)=>{eliminarMetas(row.id)}} style={{ backgroundColor: '#e53935', color: '#fff' }} >Eliminar</Button>
                                                             </TableCell>
                                                         </TableRow>
                                                      ))):

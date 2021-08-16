@@ -130,10 +130,12 @@ const ListaCuentas = () => {
             const data= async()=>{
                 await database.ref().child(z.uid).child('cuentas').on('value',(e)=>{
                 const todo=[];
-                const da= e.forEach(element => {
-                    todo.push(element.val())
-                });
-                if(todo.length>0){
+                const todos=e.val();
+                for(let id in  todos){
+                    todo.push({id,...todos[id]})
+                }
+                console.log(todo)
+                if(todo.length>=0){
                     setCuentas(todo);
                   }   
             })}
@@ -143,23 +145,18 @@ const ListaCuentas = () => {
         }})
             }
 
-    /*
-    const eliminarCuentas = async (e) => {
-        const json_data = {
-            'id_user': idUsuario
-        };
+    const eliminarCuentas = async (id) => { 
+        try{
+            await auth.onAuthStateChanged((z)=>{if(z){
+            database.ref(`/${z.uid}/cuentas/${id}`).remove()
+            .then(obtenerCuentas())
+            }})
+            }catch(e){
+                console.log(e);
+                }
+            }
 
-        const res = await fetch(`${API}/`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(json_data),
-        });
-
-        if (res.status) {
-            //const data = await res.json();
-            console.log("==========================Ahorro eliminado ==============================");
-        };
-    }*/
+  
     useEffect(() => {
         obtenerCuentas();
     }, [])
@@ -195,16 +192,16 @@ const ListaCuentas = () => {
                                                 </TableHead>
                                                 <TableBody>
                                                     {
-                                                    datosCuentas.length>0 ?
-                                                    (datosCuentas.map((row, key) => (
-                                                        <TableRow key={key}>
-                                                            <TableCell component="rigth" scope="row">{++key}</TableCell>
+                                                    datosCuentas.length>=0 ?
+                                                    (datosCuentas.map((row, ke) => (
+                                                        <TableRow key={row.id}>
+                                                            <TableCell align="center" component="rigth" scope="row">{++ke}</TableCell>
                                                             <TableCell align="right">{row.name_bank_account}</TableCell>
                                                             <TableCell align="right">{row.number_account}</TableCell>
                                                             <TableCell align="right">{row.type_bank}</TableCell>
                                                             <TableCell align="right">{row.mount}</TableCell>
                                                             <TableCell align="right">
-                                                            <Button size="small" style={{ backgroundColor: '#e53935', color: '#fff' }} >Eliminar</Button>
+                                                            <Button size="small"  onClick ={(id)=>{eliminarCuentas(row.id)}}  style={{ backgroundColor: '#e53935', color: '#fff' }} >Eliminar</Button>
                                                             </TableCell>
                                                         </TableRow>
                                                      ))):
