@@ -112,18 +112,56 @@ export default function Dashboard() {
   const classes = useStyles();
   const [informacion, setInformacion] = useState([]);
   const session_id = localStorage.getItem("Session_id");
-  const [datosCuentas, setCuentas] = useState({});
+  const [datosCuentas, setCuentas] = useState(0);
   const [sumaCuentas,setSumaCuentas]=useState(0);
   const [datosPagos, setPagos] = useState({});
   const [sumaPagos,setSumaPagos]=useState(0);
 
+  const obtenerCuentas = async () => {
+    await auth.onAuthStateChanged((z)=>{if(z){
+        const data= async()=>{
+            await database.ref().child(z.uid).child('cuentas').on('value',(e)=>{
+            let suma=0.0;
+            const todos=e.val();
+            for(let id in  todos){
+                suma+=parseFloat(todos[id].mount)
+            }
+            console.log(suma)
+            if(suma>=0){
+                setSumaCuentas(suma);
+              }   
+        })}
+        data();
+    }else{
+        alert("error")
+    }})
+        }
+
+
+        const obtenerPagos = async () => {
+          await auth.onAuthStateChanged((z)=>{if(z){
+              const data= async()=>{
+                  await database.ref().child(z.uid).child('Pagos').on('value',(e)=>{
+                  let suma=0.0;
+                  const todos=e.val();
+                  for(let id in  todos){
+                      suma+=parseFloat(todos[id].monto)
+                  }
+                  console.log(suma)
+                  if(suma>=0){
+                      setSumaPagos(suma);
+                    }   
+              })}
+              data();
+          }else{
+              alert("error")
+          }})
+              }
+
+
   useEffect(() => {
-    auth.onAuthStateChanged(e=>{
-      if(e){ 
-      }else{
-        window.location='/';
-      }
-    })
+    obtenerCuentas();
+    obtenerPagos();
   }, [])
   
   return (
@@ -134,6 +172,19 @@ export default function Dashboard() {
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
+          <Grid item xs={12} md={4} lg={3}>
+              <Deposits money={sumaCuentas-sumaPagos} title="Balance"/>              
+            </Grid>
+
+            <Grid item xs={12} md={4} lg={3}>
+              <Deposits money={sumaPagos} title="Gastos"/>
+            </Grid>
+
+            <Grid item xs={12} md={4} lg={3}>
+              <Deposits money={sumaCuentas} title="Bancos"/>              
+            </Grid>
+
+
             <Grid item xs={12}>
               <Paper className={classes.paper}>
                 <Orders />
