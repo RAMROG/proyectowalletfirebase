@@ -4,9 +4,13 @@ import profile from '../../../assets/img/profile-img.jpg';
 import "../Configuracion/Configuracion.css";
 import Menu from '../../../Components/Menu/Menu';
 import { makeStyles } from '@material-ui/core/styles';
-import { Button, TextField } from '@material-ui/core';
+import { Button, DialogContentText, TextField } from '@material-ui/core';
 import TextareaAutosize from '@material-ui/core/TextareaAutosize';
 import FilledInput from '@material-ui/core/FilledInput';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogTitle from '@material-ui/core/DialogTitle';
 
 
 
@@ -113,7 +117,9 @@ const Configuracion = () => {
     const [descripccion, setDescripccion] = useState('');
     const [telefono, setTelefono] = useState('')
     const [urlImagen, setUrlImage] = useState('')
-    const [editar, setEditar] = useState(false)
+    const [editarContra, setEditarContra] = useState(false);
+    const [editar, setEditar] = useState(false);
+
     /*falta implementacion dinamica en imput*/
     const handleSubmitActualizar = async (e) => {
         e.preventDefault();
@@ -346,7 +352,7 @@ const Configuracion = () => {
 
                                                         <div className="row" >
                                                             <div className="col-6" >
-                                                                <Button variant="contained" color="primary" data-toggle="modal" data-target="#exampleModal2" >
+                                                                <Button variant="contained" color="primary" onClick={() => setEditarContra(true)} >
                                                                     Actualiza contraseña
                                                                 </Button>
                                                             </div>
@@ -438,7 +444,7 @@ const Configuracion = () => {
                                                             onChange={e => setDescripccion(e.target.value)}
                                                             style={{ width: '100%' }}
                                                             aria-label="minimum height"
-                                                            minRows={7} 
+                                                            minRows={7}
                                                             value={descripccion}
                                                             placeholder="Sobre mi"
                                                             disabled
@@ -448,7 +454,7 @@ const Configuracion = () => {
                                             </div>
 
                                             <div className="text-center">
-                                                <Button variant="contained" color="primary" data-toggle="modal" data-target="#exampleModal1">
+                                                <Button variant="contained" color="primary" onClick={() => setEditar(true)} >
                                                     Actualizar Perfil
                                                 </Button>
                                             </div>
@@ -477,10 +483,201 @@ const Configuracion = () => {
                                     <hr></hr>
 
                                     <div>
-                                        {/* Button trigger modal */}
+
+                                        {/* MODAL CONTRASEÑA */}
+                                        <div>
+                                            <Dialog
+                                                open={editarContra}
+                                                onClose={() => setEditarContra(false)}
+                                                aria-labelledby="alert-dialog-title"
+                                                aria-describedby="alert-dialog-description"
+                                                style={{ width: '100%' }}
+                                            >
+                                                <DialogTitle id="alert-dialog-title">Actualizar contraseña</DialogTitle>
+                                                <DialogContent>
+                                                    <DialogContentText id="alert-dialog-description">
+                                                        <div className="modal-body" style={{ width: 300 }} >
+                                                            <div className="form-group">
+                                                                <label>Contraseña anterior</label>
+                                                                <input placeholder="Contraseña" value={contraseña} onChange={(e) => setContraseña(e.target.value)} type="password" className="form-control" ></input>
+                                                            </div>
+                                                            <div className="form-group">
+                                                                <label>Contraseña nueva</label>
+                                                                <input placeholder="Contraseña nueva" value={contraseñaNueva} onChange={(e) => setContraseñaNueva(e.target.value)} type="password" className="form-control" ></input>
+                                                            </div>
+                                                            <div className="form-group">
+                                                                <label>Confirmar Contraseña</label>
+                                                                <input placeholder="Confirmar contraseña" value={confirmar} onChange={(e) => setConfirmar(e.target.value)} type="password" className="form-control"></input>
+                                                            </div>
+                                                        </div>
+                                                    </DialogContentText>
+                                                </DialogContent>
+                                                <DialogActions>
+                                                    <Button onClick={() => setEditarContra(false)} color="primary">
+                                                        Cancelar
+                                                    </Button>
+                                                    <Button color="primary" onClick={actualizarContrasena} autoFocus>
+                                                        Actualizar
+                                                    </Button>
+                                                </DialogActions>
+                                            </Dialog>
+                                        </div>
+                                        {/* FIN MODAL CONTRASEÑA */}
+
+
+                                        {/* MODAL EDITAR PERFIL */}
+                                        <div>
+                                            <Dialog
+                                                open={editar}
+                                                onClose={() => setEditar(false)}
+                                                aria-labelledby="alert-dialog-title"
+                                                aria-describedby="alert-dialog-description"
+                                                style={{ width: '100%' }}
+                                            >
+                                                <DialogTitle id="alert-dialog-title">Actualizar perfil</DialogTitle>
+                                                <DialogContent>
+                                                    <DialogContentText id="alert-dialog-description">
+                                                        <div className="modal-body" style={{ width: 500 }} >
+                                                            <div className="col-md-12">
+                                                                <div className="form-group mt-0">
+                                                                    <TextField
+                                                                        style={{ width: '100%' }}
+                                                                        id="standard-multiline-flexible"
+                                                                        label="Correo Electronico"
+                                                                        maxRows={4}
+                                                                        value={email}
+                                                                        onChange={e => setEmail(e.target.value)}
+                                                                    />
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="col-md-12">
+                                                                <div className="form-group">
+                                                                    <TextField
+                                                                        style={{ width: '100%' }}
+                                                                        id="standard-multiline-flexible"
+                                                                        label="Nombre"
+                                                                        maxRows={4}
+                                                                        value={name}
+                                                                        onChange={e => setName(e.target.value)}
+                                                                    />
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="col-md-12">
+                                                                <div className="form-group">
+                                                                    <TextField
+                                                                        style={{ width: '100%' }}
+                                                                        id="standard-multiline-flexible"
+                                                                        label="Apellido"
+                                                                        maxRows={4}
+                                                                        value={last_name}
+                                                                        onChange={e => setLastName(e.target.value)}
+                                                                    />
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="col-md-12">
+                                                                <div className="form-group">
+                                                                    <TextField
+                                                                        style={{ width: '100%' }}
+                                                                        id="standard-multiline-flexible"
+                                                                        label="Direccion"
+                                                                        maxRows={4}
+                                                                        value={direccion}
+                                                                        onChange={e => setDireccion(e.target.value)}
+                                                                    />
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="row">
+                                                                <div className="col-6" >
+                                                                    <div className="form-group">
+                                                                        <TextField
+                                                                            style={{ width: '100%' }}
+                                                                            id="standard-multiline-flexible"
+                                                                            label="Cuidad"
+                                                                            maxRows={4}
+                                                                            value={ciudad}
+                                                                            onChange={e => setCiudad(e.target.value)}
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                                <div className="col-6" >
+                                                                    <div className="form-group">
+                                                                        <TextField
+                                                                            style={{ width: '100%' }}
+                                                                            id="standard-multiline-flexible"
+                                                                            label="Pais"
+                                                                            maxRows={4}
+                                                                            value={pais}
+                                                                            onChange={e => setPais(e.target.value)}
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                                <div className="col-6" >
+                                                                    <div className="form-group">
+                                                                        <TextField
+                                                                            style={{ width: '100%' }}
+                                                                            id="standard-multiline-flexible"
+                                                                            label="Codigo postal"
+                                                                            maxRows={4}
+                                                                            value={codigoPostal}
+                                                                            onChange={e => setCodigoPostal(e.target.value)}
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                                <div className="col-6" >
+                                                                    <div className="form-group">
+                                                                        <TextField
+                                                                            style={{ width: '100%' }}
+                                                                            id="standard-multiline-flexible"
+                                                                            label="telefono"
+                                                                            maxRows={4}
+                                                                            value={telefono}
+                                                                            onChange={e => setTelefono(e.target.value)}
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                                <div className="col-md-12">
+                                                                    <div className="form-group">
+                                                                        <TextareaAutosize
+                                                                            onChange={e => setDescripccion(e.target.value)}
+                                                                            style={{ width: '100%', height: '100%' }}
+                                                                            aria-label="minimum height"
+                                                                            minRows={5}
+                                                                            value={descripccion}
+                                                                            placeholder="Descripcion perfil"
+
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </DialogContentText>
+                                                </DialogContent>
+                                                <DialogActions>
+                                                    <Button onClick={() => setEditar(false)} color="primary">
+                                                        Cancelar
+                                                    </Button>
+                                                    <Button onClick={actualizarInformacion} color="primary" autoFocus>
+                                                        Actualizar
+                                                    </Button>
+                                                </DialogActions>
+                                            </Dialog>
+                                        </div>
+                                        {/* FIN MODAL EDITAR PERFIL */}
+
+
+
+
+
+
+
+
 
                                         {/* Modal */}
-                                        <div style={{ marginTop: "5vh" }} className="modal fade" id="exampleModal2" tabIndex={-1} role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div style={{ marginTop: "5vh" }} className="modal fade d-none" id="exampleModal2" tabIndex={-1} role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                             <div className="modal-dialog" role="document">
                                                 <div className="modal-content">
                                                     <div className="modal-header">
