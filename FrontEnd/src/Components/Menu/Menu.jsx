@@ -24,7 +24,7 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import SettingsIcon from '@material-ui/icons/Settings';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import LayersIcon from '@material-ui/icons/Layers';
-
+import Avatar from '@material-ui/core/Avatar';
 
 import { auth, db } from '../../firebaseconf'
 const drawerWidth = 240;
@@ -127,25 +127,6 @@ export default function Menu() {
     })
   }
 
-  const obtenerAvatares = () => {
-    try {
-      const response = db.collection('nombreColeccion').get();
-      let data = [];
-
-      response.forEach(user => {
-        data.push({
-          id: user.id,
-          ...user.data()
-        });
-      });
-
-      setAvatares(data);
-
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
 
   useEffect(() => {
     obtenerDatos();
@@ -192,32 +173,7 @@ export default function Menu() {
           </Typography>
           <IconButton color="inherit">
 
-            <div className="dropdown">
-              <a className="btn dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <img className="img-fluid rounded-circle" height="30px" width="30px" src="https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_1280.png" alt="img-foto" />
-              </a>
-
-              <div className="dropdown-menu" aria-labelledby="dropdownMenuLink">
-
-                {
-
-                  avatares.map(user => {
-                    return (
-                      <div className="row" >
-                        <div className="col-3" >
-                          <img className="img-fluid rounded-circle m-1" height="30px" width="30px" src={user.photoURL} alt="img-foto" />
-                        </div>
-                        <div className="col-9" >
-                          <p className="m-1" >{user.displayName}</p>
-                        </div>
-                      </div>
-                    )
-                  })
-
-                }
-
-              </div>
-            </div>
+          <Avatar>{email.charAt(0)}</Avatar>
           </IconButton>
         </Toolbar>
       </AppBar>
