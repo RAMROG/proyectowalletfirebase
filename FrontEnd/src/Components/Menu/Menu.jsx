@@ -149,7 +149,7 @@ export default function Menu() {
 
   useEffect(() => {
     obtenerDatos();
-    obtenerAvatares();
+
   }, []);
 
   const classes = useStyles();
@@ -161,11 +161,14 @@ export default function Menu() {
     setOpen(false);
   };
 
-  const cerrarSesion = async () => {
-    localStorage.clear();
-    await auth.signOut()
-      .then(window.location = "/")
-      .catch()
+  const cerrarSesion = () => {
+    try{
+      localStorage.clear()
+      auth.signOut();
+      window.location='/';
+    }catch(e){
+      console.log(e)
+    }
   };
 
   return (

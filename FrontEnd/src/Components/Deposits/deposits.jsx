@@ -38,7 +38,10 @@ export default function Deposits(props) {
         <Typography variant="h5" component="h2">
         </Typography>
         <Typography className={classes.pos} color="textSecondary">
-          Movimiento {props.money}
+          {props.title=="Porcentaje Gastos"?
+          (props.money>0 ?(<h5>Porcentaje Gasto: {props.money}%</h5>):(<h5>Porcentaje Gasto: 0 %</h5>))
+          :
+          (<h5>Total: L.{props.money}</h5>)}
         </Typography>
         <Typography variant="body2" component="p">
           Este es el resumen de:

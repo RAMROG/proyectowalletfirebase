@@ -181,9 +181,11 @@ export default function Dashboard() {
             </Grid>
 
             <Grid item xs={12} md={4} lg={3}>
-              <Deposits money={sumaCuentas} title="Bancos"/>              
+              <Deposits money={sumaCuentas} title="Cuentas"/>              
             </Grid>
-
+            <Grid item xs={12} md={4} lg={3}>
+              <Deposits money={((sumaPagos*100)/sumaCuentas).toFixed(2)} title="Porcentaje Gastos"/>              
+            </Grid>
 
             <Grid item xs={12}>
               <Paper className={classes.paper}>

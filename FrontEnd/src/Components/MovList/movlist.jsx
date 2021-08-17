@@ -116,7 +116,7 @@ export default function Movlist() {
             datosCuentas.length>0 ?
             (datosCuentas.map((row, key) => (
               <TableRow key={key}>
-                <TableCell component="rigth" scope="row">{++key}</TableCell>
+                           <TableCell  align="right">{++key}</TableCell>
                            <TableCell align="right">{row.name_bank_account}</TableCell>
                            <TableCell align="right">{row.number_account}</TableCell>
                             <TableCell align="right">{row.type_bank}</TableCell>
@@ -129,6 +129,7 @@ export default function Movlist() {
         </TableBody>
       </Table>
       <Title align="center"></Title>
+      <br></br><br></br><br></br>
       <Title align="center">Pagos Realizados</Title>
       <Table className={styles.table} size="small" aria-label="a dense table">
                                                 <TableHead>
@@ -145,7 +146,7 @@ export default function Movlist() {
                                                     datosPagos.length>0 ?
                                                     (datosPagos.map((row, key) => (
                                                         <TableRow key={key}>
-                                                            <TableCell component="rigth" scope="row">{key++}</TableCell>
+                                                            <TableCell align="right">{++key}</TableCell>
                                                             <TableCell align="right">{row.nombrePago}</TableCell>
                                                             <TableCell align="right">{row.monto}</TableCell>
                                                             <TableCell align="right">{row.categoria}</TableCell>
@@ -158,6 +159,7 @@ export default function Movlist() {
                                                 </TableBody>
                           
                                             </Table>
+                                            <br></br><br></br><br></br>
                                             <Link to='/cuentas'>
                                                     <p>Ir a crear cuentas y pagos nuevos</p>
                                                 </Link>
