@@ -243,7 +243,7 @@ const MetasPlanes = () => {
 
     return (
         <div className={classes.root}>
-            <Menu>
+            <Menu title="Metas y planes">
                 {/**Barra Lateral y Barra Horizontal */}
             </Menu>
             <main className={classes.content}>

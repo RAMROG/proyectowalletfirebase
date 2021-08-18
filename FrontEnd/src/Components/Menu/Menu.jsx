@@ -26,7 +26,7 @@ import BarChartIcon from '@material-ui/icons/BarChart';
 import LayersIcon from '@material-ui/icons/Layers';
 import Avatar from '@material-ui/core/Avatar';
 
-import { auth, db } from '../../firebaseconf'
+import { auth} from '../../firebaseconf'
 const drawerWidth = 240;
 
 
@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
     ...theme.mixins.toolbar,
   },
   appBar: {
-    zIndex: theme.zIndex.drawer + 1,
+    zIndex: theme.zIndex.drawer + 2,
     transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
@@ -109,17 +109,20 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Menu() {
+export default function Menu(props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [openMenu, setopenMenu] = useState(false)
   const [email, setEmail] = useState('');
+  const [name, setName]=useState('');
   const [avatares, setAvatares] = useState([])
 
 
   const obtenerDatos = async () => {
     await auth.onAuthStateChanged((z) => {
       if (z) {
-        setEmail(z.displayName);
+        let nam=z.displayName.split(" ");
+        setName(nam[0].charAt(0)+nam[1].charAt(0))
+        setEmail(z.email)
       }
     })
   }
@@ -142,8 +145,7 @@ export default function Menu() {
   const cerrarSesion = () => {
     try{
       localStorage.clear()
-      auth.signOut();
-      window.location='/';
+      auth.signOut().then(()=>{window.location='/';}).catch(e=>{console.log(e)})
     }catch(e){
       console.log(e)
     }
@@ -152,7 +154,7 @@ export default function Menu() {
   return (
     <div>
       <CssBaseline />
-      <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
+      <AppBar position="absolute" style={{background:"#566573"}} className={clsx(classes.appBar, open && classes.appBarShift)}>
         <Toolbar className={classes.toolbar}>
           <IconButton
             edge="start"
@@ -164,23 +166,23 @@ export default function Menu() {
             <MenuIcon />
           </IconButton>
           <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-            {
-              setEmail.length > 0 ? (<p>Bienvenido a Wallet {email}</p>) : (<p>Wallet</p>)
-            }
+            
+              <p>{props.title}</p> 
+            
           </Typography>
           <IconButton color="inherit">
-
-          <Avatar>{email.charAt(0)}</Avatar>
+          <h6 style={{color:"white"}}>{email} </h6>
+          <Avatar>{name}</Avatar>
           </IconButton>
         </Toolbar>
       </AppBar>
       <Drawer
-        variant="permanent"
+        variant="persistent"
         classes={{
           paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose),
         }}
         open={open}
-        style={{ height: "100vh" }}
+        style={{ height: "100vh"}}
       >
         <div className={classes.toolbarIcon}>
           <IconButton onClick={handleDrawerClose}>
@@ -235,7 +237,7 @@ export default function Menu() {
           </Link>
 
 
-          <ListItem button onClick={cerrarSesion} >
+          <ListItem button onClick={e=>{cerrarSesion()}} >
             <ListItemIcon>
               <ExitToAppIcon />
             </ListItemIcon>

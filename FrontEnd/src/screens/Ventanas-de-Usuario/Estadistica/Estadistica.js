@@ -140,7 +140,7 @@ const Estadistica = () => {
 
     return (
         <div className={classes.root}>
-        <Menu>
+        <Menu title="Estadistica">
           {/**Barra Lateral y Barra Horizontal */}
         </Menu>
       <main className={classes.content}>

@@ -175,7 +175,7 @@ const Cuentas = () => {
 
     return (
         <div className={classes.root}>
-            <Menu>
+            <Menu title="Cuentas y Pagos">
                 {/**Barra Lateral y Barra Horizontal */}
             </Menu>
             <main className={classes.content}>

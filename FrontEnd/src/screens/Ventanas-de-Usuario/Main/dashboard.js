@@ -166,24 +166,24 @@ export default function Dashboard() {
   
   return (
       <div className={classes.root}>
-        <Menu>
+        <Menu title="Pagina Principal">
         </Menu>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
-          <Grid item xs={12} md={4} lg={3}>
+          <Grid item xs={6} md={4} lg={3}>
               <Deposits money={sumaCuentas-sumaPagos} title="Balance"/>              
             </Grid>
 
-            <Grid item xs={12} md={4} lg={3}>
+            <Grid item xs={6} md={4} lg={3}>
               <Deposits money={sumaPagos} title="Gastos"/>
             </Grid>
 
-            <Grid item xs={12} md={4} lg={3}>
+            <Grid item xs={6} md={4} lg={3}>
               <Deposits money={sumaCuentas} title="Cuentas"/>              
             </Grid>
-            <Grid item xs={12} md={4} lg={3}>
+            <Grid item xs={6} md={4} lg={3}>
               <Deposits money={((sumaPagos*100)/sumaCuentas).toFixed(2)} title="Porcentaje Gastos"/>              
             </Grid>
 

@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import profile from '../../../assets/img/profile-img.jpg';
 import "../Configuracion/Configuracion.css";
 import Menu from '../../../Components/Menu/Menu';
 import { makeStyles } from '@material-ui/core/styles';
 import { Button, DialogContentText, TextField } from '@material-ui/core';
 import TextareaAutosize from '@material-ui/core/TextareaAutosize';
-import FilledInput from '@material-ui/core/FilledInput';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -104,12 +101,9 @@ const Configuracion = () => {
     const classes = useStyles();
     const [email, setEmail] = useState('');
     const [name, setName] = useState('');
-    const [contraseña, setContraseña] = useState('');
     const [contraseñaNueva, setContraseñaNueva] = useState('');
     const [confirmar, setConfirmar] = useState('');
     const [last_name, setLastName] = useState('');
-    const [password, setPassword] = useState('');
-    const [nameImage, setNameImage] = useState('')
     //campos nuevos favor agregar a la base
     const [direccion, setDireccion] = useState("");
     const [ciudad, setCiudad] = useState("");
@@ -117,7 +111,6 @@ const Configuracion = () => {
     const [codigoPostal, setCodigoPostal] = useState('');
     const [descripccion, setDescripccion] = useState('');
     const [telefono, setTelefono] = useState('')
-    const [urlImagen, setUrlImage] = useState('')
     const [editarContra, setEditarContra] = useState(false);
     const [editar, setEditar] = useState(false);
 
@@ -129,17 +122,23 @@ const Configuracion = () => {
             //id_user : idUsuario,
             direccion: direccion,
             telefono: telefono,
-            cuidad: ciudad,
+            ciudad: ciudad,
             pais: pais,
             codigoPostal : codigoPostal,
             descripccion:descripccion
 
         };
         try{
+            
             await auth.onAuthStateChanged((z)=>{if(z){
                 database.ref(`/${z.uid}/informacion/`).set(json_data)
-                .then(setEditar(false))
+                .then(e=>{
+                    let use=auth.currentUser;
+                    use.updateProfile({
+                    displayName:name+" "+last_name })
+                    setEditar(false)})
                     }})
+                    .then()
             }catch(e){
                console.log(e);
          }
@@ -150,7 +149,7 @@ const Configuracion = () => {
           if (z) {
             let nombre=z.displayName.split(" ");
             setName(nombre[0])
-            setLastName(nombre[2])
+            setLastName(nombre[1])
             setEmail(z.email)
             setTelefono(z.phoneNumber)
           }
@@ -189,26 +188,32 @@ const Configuracion = () => {
         document.getElementById('input-img-perfil').click();
     }
 
-    const actualizarContrasena = () => {
+    const actualizarContrasena =async() => {
         if (contraseñaNueva !== confirmar) {
-            console.log('NO hacer la peticion');
+            alert("Las contraselas nuevas no coinciden")
         } else {
             console.log('hacer la peticion');
-
-            let data = {
-                contraseña,
-                confirmar,
-                contraseñaNueva
-            }
-            console.log(data)
+            const user =auth.currentUser;
+            user.updatePassword(contraseñaNueva).then((e)=>{
+                console.log('contraseña modificada correctamente')
+                auth.signOut().then(()=>{window.location='/login'}).catch(e=>{console.log(e)})
+            }).catch(e=>{
+                if(e.message=="Password should be at least 6 characters"){
+                    alert("La contraseña es muy corta, debe tener al menos 7 caracteres")
+                }else{
+                    if(e.code=="auth/requires-recent-login" || e.code=="auth/user-token-expired"){
+                        alert("debe iniciar de nuevo para poder modificar la contraseña")
+                        window.location="/login"
+                    }
+                }
+                console.log(e)})
         }
     }
-
    
     return (
         <>
             <div className={classes.root}>
-                <Menu />
+                <Menu title="Perfil de usuario"/>
                 <main style={{ marginTop: "8vh" }} className={classes.content}>
                     <div className="content">
                         <div className="row-perfil d-flex justify-content-center" style={{ marginTop: "10vh" }}>
@@ -254,7 +259,7 @@ const Configuracion = () => {
                         multiline
                         maxRows={4}
                         value={last_name}
-                        onChange={e => setName(e.target.value)}
+                        onChange={e => setLastName(e.target.value)}
                         disabled
                         />
                 </Grid>
@@ -266,7 +271,7 @@ const Configuracion = () => {
                         multiline
                         maxRows={4}
                         value={ciudad}
-                        onChange={e => setName(e.target.value)}
+                        onChange={e => setCiudad(e.target.value)}
                         disabled
                         />
                 </Grid>
@@ -278,7 +283,7 @@ const Configuracion = () => {
                         multiline
                         maxRows={4}
                         value={pais}
-                        onChange={e => setName(e.target.value)}
+                        onChange={e => setPais(e.target.value)}
                         disabled
                         />
                 </Grid>
@@ -290,7 +295,7 @@ const Configuracion = () => {
                         multiline
                         maxRows={4}
                         value={codigoPostal}
-                        onChange={e => setName(e.target.value)}
+                        onChange={e => setCodigoPostal(e.target.value)}
                         disabled
                         />
                 </Grid>
@@ -302,14 +307,14 @@ const Configuracion = () => {
                         multiline
                         maxRows={4}
                         value={telefono}
-                        onChange={e => setName(e.target.value)}
+                        onChange={e => setTelefono(e.target.value)}
                         disabled
                         />
                 </Grid>
                 <Grid item xs={12}>
                     Descripcion de Perfil
                     <TextareaAutosize
-                         onChange={e => setDescripccion(e.target.value)}
+                        onChange={e => setDescripccion(e.target.value)}
                         style={{ width: '100%' }}
                         aria-label="minimum height"
                         minRows={7}
@@ -355,10 +360,6 @@ const Configuracion = () => {
                                                 <DialogContent>
                                                     <DialogContentText id="alert-dialog-description">
                                                         <div className="modal-body" style={{ width: 300 }} >
-                                                            <div className="form-group">
-                                                                <label>Contraseña anterior</label>
-                                                                <input placeholder="Contraseña" value={contraseña} onChange={(e) => setContraseña(e.target.value)} type="password" className="form-control" ></input>
-                                                            </div>
                                                             <div className="form-group">
                                                                 <label>Contraseña nueva</label>
                                                                 <input placeholder="Contraseña nueva" value={contraseñaNueva} onChange={(e) => setContraseñaNueva(e.target.value)} type="password" className="form-control" ></input>

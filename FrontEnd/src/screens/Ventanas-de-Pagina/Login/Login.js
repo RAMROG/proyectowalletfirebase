@@ -12,11 +12,9 @@ import Checkbox from '@material-ui/core/Checkbox';
 //import { Link } from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import { Mail } from "@material-ui/icons";
 
 
 
@@ -54,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Login() {
-  const history = useHistory();
+
   const classes = useStyles();
 
   const [email, setEmail] = useState("");
@@ -82,18 +80,21 @@ export default function Login() {
                 alert('su cuenta no esta verificada, revise su correo electronico')
               }
            })
-          localStorage.setItem('Session_email', email);
-          localStorage.setItem('Session_name', nameUser);
-          localStorage.setItem('Session_id', idUser);
-          localStorage.setItem('verficacion',verifica); 
         })
         .catch((error)=>{
           if(error=="Error: The password is invalid or the user does not have a password."){
             alert('Usuario y/o contraseña incorrectas, verifique su informacion')
           }else{
-            if(error=="Error: The password is invalid or the user does not have a password."){
-              alert("La contraseña no cumple los requisitos")
-            }
+            if(error.message=="There is no user record corresponding to this identifier. The user may have been deleted."){
+              alert("Este correo no tiene cuenta en nuestra plataforma")
+            }else{if(error.message=="The email address is badly formatted."){
+              alert("La informacion ingresada en el correo electronico es invalido")
+            }else{
+              if(error.message=="A network error (such as timeout, interrupted connection or unreachable host) has occurred."){
+                alert("Se ha producido un error de red (como tiempo de espera, conexión interrumpida o host inaccesible)")
+              }
+            }}
+            console.log(error)
           }
         })
     };
