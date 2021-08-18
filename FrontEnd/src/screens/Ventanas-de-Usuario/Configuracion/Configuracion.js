@@ -11,6 +11,8 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Grid from '@material-ui/core/Grid';
+import {auth,database} from "../../../firebaseconf"
 
 
 
@@ -102,7 +104,6 @@ const Configuracion = () => {
     const classes = useStyles();
     const [email, setEmail] = useState('');
     const [name, setName] = useState('');
-    const [imagen, setImagen] = useState(null);
     const [contraseña, setContraseña] = useState('');
     const [contraseñaNueva, setContraseñaNueva] = useState('');
     const [confirmar, setConfirmar] = useState('');
@@ -123,81 +124,66 @@ const Configuracion = () => {
     /*falta implementacion dinamica en imput*/
     const handleSubmitActualizar = async (e) => {
         e.preventDefault();
+
         const json_data = {
-            'email': email,
-            'name': name,
-            'last_name': last_name,
-            'password': password,
-            'direccion': direccion,
-            'ciudad': ciudad,
-            'pais': pais,
-            'codigoPostal': codigoPostal,
-            'descripcion': descripccion,
-            'telefono': telefono
-        }
+            //id_user : idUsuario,
+            direccion: direccion,
+            telefono: telefono,
+            cuidad: ciudad,
+            pais: pais,
+            codigoPostal : codigoPostal,
+            descripccion:descripccion
 
-        const res = await fetch(`${API}/`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(json_data),
-        });
-
-        const data = await res.json();
-        console.log(data);
-        //crear condicion y sustituir valores en BD
+        };
+        try{
+            await auth.onAuthStateChanged((z)=>{if(z){
+                database.ref(`/${z.uid}/informacion/`).set(json_data)
+                .then(setEditar(false))
+                    }})
+            }catch(e){
+               console.log(e);
+         }
     };
 
+    const obtenerDatos = async () => {
+        await auth.onAuthStateChanged((z) => {
+          if (z) {
+            let nombre=z.displayName.split(" ");
+            setName(nombre[0])
+            setLastName(nombre[2])
+            setEmail(z.email)
+            setTelefono(z.phoneNumber)
+          }
+        })
+        await auth.onAuthStateChanged((z)=>{if(z){
+            const data= async()=>{
+                await database.ref().child(z.uid).child('informacion').on('value',(e)=>{
+                const todos=e.val();
+                console.log(todos.codigoPostal)
+                if(todos){
+                    setCodigoPostal(todos.codigoPostal)
+                    setCiudad(todos.ciudad)
+                    setDescripccion(todos.descripccion)
+                    setDireccion(todos.direccion)
+                    setPais(todos.pais)
+                    setTelefono(todos.telefono)
+                    console.log("llego")
+                  }   
+            })}
+            data();
+        }else{
+            alert("error")
+        }})
+      }
+
+
+
     useEffect(() => {
-        getUser();
+        obtenerDatos();
     }, [])
 
-    const getUser = () => {
+    
 
-        let nameUsuario = localStorage.getItem("name");
-        let last_nameUsuario = localStorage.getItem("last_name");
-        let emailUsuario = localStorage.getItem("email");
-        let direccionUsuario = localStorage.getItem("direccion");
-        let ciudadUsuario = localStorage.getItem("ciudad");
-        let telefonoUsuario = localStorage.getItem("telefono");
-        let paisUsuario = localStorage.getItem("pais");
-        let codigoPostalUsuario = localStorage.getItem("codigoPostal");
-        let descripcionUsuario = localStorage.getItem("descripcion");
-
-        setName(nameUsuario);
-        setLastName(last_nameUsuario);
-        setCiudad(ciudadUsuario);
-        setEmail(emailUsuario);
-        setDireccion(direccionUsuario);
-        setDescripccion(descripcionUsuario);
-        setTelefono(telefonoUsuario);
-        setCodigoPostal(codigoPostalUsuario);
-        setPais(paisUsuario);
-
-    }
-
-    const subirImagen = async (e) => {
-        let formData = new FormData();
-        let imagen = e.target.files[0];
-        let uploadPreset = 'h7gfbvl6';
-        let urlApiImagen = 'https://api.cloudinary.com/v1_1/dnnfs5ttk/image/upload';
-        formData.append('file', imagen);
-        formData.append('upload_preset', uploadPreset);
-
-        const response = await fetch(urlApiImagen, {
-            method: 'POST',
-            body: formData
-        });
-
-        const body = await response.json();
-        const { url } = body;
-
-        const res = await fetch('Direccion de su endepoing para visualizar la foto', {
-            method: 'PUT',
-            body: JSON.stringify({ urlFoto: url })
-        });
-        const bodyFoto = await res.json();
-        console.log(bodyFoto);
-    }
 
     const openDialogoImagen = () => {
         document.getElementById('input-img-perfil').click();
@@ -215,63 +201,10 @@ const Configuracion = () => {
                 contraseñaNueva
             }
             console.log(data)
-
-
-            // try {
-            //     let response = await fetch(`${API}/`, {
-            //         method: "POST",
-            //         headers: { "Content-Type": "application/json" },
-            //         body: JSON.stringify(data),
-            //     });
-            //     let body = await response.json();
-
-            //     console.log('Respuesta del servidor => ', body)
-
-            // } catch (error) {
-            //     console.error(error);
-            // }
-
-
         }
     }
 
-    const actualizarInformacion = () => {
-        let data = {
-            email,
-            name,
-            last_name,
-            direccion,
-            ciudad,
-            pais,
-            telefono,
-            descripccion,
-            codigoPostal
-        }
-        console.log(data)
-
-        // try {
-        //     let response = await fetch(`${API}/`, {
-        //         method: "POST",
-        //         headers: { "Content-Type": "application/json" },
-        //         body: JSON.stringify(data),
-        //     });
-        //     let body = await response.json();
-
-        //     console.log('Respuesta del servidor => ', body)
-
-        // } catch (error) {
-        //     console.error(error);
-        // }
-
-    }
-
-    const cerrarSesion = async (e) => {
-        e.preventDefault();
-
-        localStorage.clear();
-        window.location.href = "http://localhost:3000/login";
-    }
-
+   
     return (
         <>
             <div className={classes.root}>
@@ -282,182 +215,123 @@ const Configuracion = () => {
                             <div className="col-md-8">
                                 <div className="card">
                                     <div className="card-header">
-                                        <h5 className="title">Configuracion Perfil</h5>
+                                        <h5 className="title" style={{textAlign: 'center'}} >CONFIGURACION DE PERFIL</h5>
                                     </div>
                                     <div className="card-body">
                                         <form>
-                                            <div className="row-perfil m-2">
-                                                <div className="col-md-12 d-none">
-                                                    <div className="form-group">
-                                                        <label>Imagen perfil</label>
-                                                        <input onChange={subirImagen} className="d-none" type="file" id="input-img-perfil" />
-                                                        <input disabled="" placeholder="img" type="text" className="form-control d-none"></input>
-                                                        <div className="alert subir-img" role="alert" onClick={openDialogoImagen} >
-                                                            <p className="text-dark text-sm" >
-                                                                <span>
-                                                                    <img height="25px" width="25px" src="https://png.pngtree.com/png-clipart/20190903/original/pngtree-file-icon-png-image_4419863.jpg" />
-                                                                </span> {nameImage.trim() == 0 ? 'Haz click para subir la imagen' : nameImage}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                            
 
-                                                <div className="col-md-12">
-                                                    <div className="form-group">
-                                                        <TextField
-                                                            style={{ width: '100%' }}
-                                                            id="standard-multiline-flexible"
-                                                            label="Correo Electronico"
-                                                            multiline
-                                                            maxRows={4}
-                                                            value={email}
-                                                            onChange={e => setEmail(e.target.value)}
-                                                            disabled
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
+            <Grid container spacing={3}>
+                <Grid item xs={12}>
+                    Correo Electronico
+                    <TextField
+                        style={{ width: '100%' }}
+                        id="standard-multiline-flexible"
+                        multiline
+                        maxRows={4}
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        disabled
+                      />
+                </Grid>
+                <Grid item xs={6}>
+                    Nombre
+                    <TextField
+                        style={{ width: '100%' }}
+                        id="standard-multiline-flexible"
+                        multiline
+                        maxRows={4}
+                        value={name}
+                        onChange={e => setName(e.target.value)}
+                        disabled
+                        />
+                </Grid>
+                <Grid item xs={6}>
+                    Apellido
+                    <TextField
+                        style={{ width: '100%' }}
+                        id="standard-multiline-flexible"
+                        multiline
+                        maxRows={4}
+                        value={last_name}
+                        onChange={e => setName(e.target.value)}
+                        disabled
+                        />
+                </Grid>
+                <Grid item xs={6}>
+                    Cuidad
+                    <TextField
+                        style={{ width: '100%' }}
+                        id="standard-multiline-flexible"
+                        multiline
+                        maxRows={4}
+                        value={ciudad}
+                        onChange={e => setName(e.target.value)}
+                        disabled
+                        />
+                </Grid>
+                <Grid item xs={6}>
+                    Pais
+                    <TextField
+                        style={{ width: '100%' }}
+                        id="standard-multiline-flexible"
+                        multiline
+                        maxRows={4}
+                        value={pais}
+                        onChange={e => setName(e.target.value)}
+                        disabled
+                        />
+                </Grid>
+                <Grid item xs={6}>
+                    Codigo Postal
+                    <TextField
+                        style={{ width: '100%' }}
+                        id="standard-multiline-flexible"
+                        multiline
+                        maxRows={4}
+                        value={codigoPostal}
+                        onChange={e => setName(e.target.value)}
+                        disabled
+                        />
+                </Grid>
+                <Grid item xs={6}>
+                    Numero de Telefono
+                    <TextField
+                        style={{ width: '100%' }}
+                        id="standard-multiline-flexible"
+                        multiline
+                        maxRows={4}
+                        value={telefono}
+                        onChange={e => setName(e.target.value)}
+                        disabled
+                        />
+                </Grid>
+                <Grid item xs={12}>
+                    Descripcion de Perfil
+                    <TextareaAutosize
+                         onChange={e => setDescripccion(e.target.value)}
+                        style={{ width: '100%' }}
+                        aria-label="minimum height"
+                        minRows={7}
+                        value={descripccion}
+                       disabled
+                            />
+                </Grid>
 
-                                            <div className="row m-2">
-                                                <div className="col-md-12">
-                                                    <div className="form-group">
-                                                        <TextField
-                                                            style={{ width: '100%' }}
-                                                            id="standard-multiline-flexible"
-                                                            label="Nombre"
-                                                            multiline
-                                                            maxRows={4}
-                                                            value={name}
-                                                            onChange={e => setName(e.target.value)}
-                                                            disabled
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="col-md-12">
-                                                    <div className="form-group">
-                                                        <TextField
-                                                            style={{ width: '100%' }}
-                                                            id="standard-multiline-flexible"
-                                                            label="Correo Electronico"
-                                                            multiline
-                                                            maxRows={4}
-                                                            value={last_name}
-                                                            onChange={e => setLastName(e.target.value)}
-                                                            disabled
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="col-md-12">
-                                                    <div className="form-group">
-
-                                                        <div className="row" >
-                                                            <div className="col-6" >
-                                                                <Button variant="contained" color="primary" onClick={() => setEditarContra(true)} >
-                                                                    Actualiza contraseña
-                                                                </Button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="row m-2">
-                                                <div className="col-md-12">
-                                                    <div className="form-group">
-                                                        <TextField
-                                                            style={{ width: '100%' }}
-                                                            id="standard-multiline-flexible"
-                                                            label="Direccion"
-                                                            multiline
-                                                            maxRows={4}
-                                                            value={direccion}
-                                                            onChange={e => setDireccion(e.target.value)}
-                                                            disabled
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="col-md-12">
-                                                    <div className="form-group">
-                                                        <TextField
-                                                            style={{ width: '100%' }}
-                                                            id="standard-multiline-flexible"
-                                                            label="Numero de telefono"
-                                                            multiline
-                                                            maxRows={4}
-                                                            value={telefono}
-                                                            onChange={e => setTelefono(e.target.value)}
-                                                            disabled
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="row m-2">
-                                                <div className="pr-1 col-md-12">
-                                                    <div className="form-group">
-                                                        <TextField
-                                                            style={{ width: '100%' }}
-                                                            id="standard-multiline-flexible"
-                                                            label="Ciudad"
-                                                            multiline
-                                                            maxRows={4}
-                                                            value={ciudad}
-                                                            onChange={e => setCiudad(e.target.value)}
-                                                            disabled
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="col-md-12">
-                                                    <div className="form-group">
-                                                        <TextField
-                                                            style={{ width: '100%' }}
-                                                            id="standard-multiline-flexible"
-                                                            label="Pais"
-                                                            multiline
-                                                            maxRows={4}
-                                                            value={pais}
-                                                            onChange={e => setPais(e.target.value)}
-                                                            disabled
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="col-md-12">
-                                                    <div className="form-group">
-                                                        <TextField
-                                                            style={{ width: '100%' }}
-                                                            id="standard-multiline-flexible"
-                                                            label="Codigo Postal"
-                                                            multiline
-                                                            maxRows={4}
-                                                            value={codigoPostal}
-                                                            onChange={e => setCodigoPostal(e.target.value)}
-                                                            disabled
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="row m-2">
-                                                <div className="col-md-12">
-                                                    <div className="form-group">
-                                                        <TextareaAutosize
-                                                            onChange={e => setDescripccion(e.target.value)}
-                                                            style={{ width: '100%' }}
-                                                            aria-label="minimum height"
-                                                            minRows={7}
-                                                            value={descripccion}
-                                                            placeholder="Sobre mi"
-                                                            disabled
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="text-center">
-                                                <Button variant="contained" color="primary" onClick={() => setEditar(true)} >
-                                                    Actualizar Perfil
-                                                </Button>
-                                            </div>
+                <Grid item xs={3}></Grid>
+                <Grid item xs={3}>
+                        <Button variant="contained" color="primary" onClick={() => setEditar(true)} >
+                            Actualizar Perfil
+                        </Button>
+                </Grid>
+                <Grid item xs={3}>
+                    <Button  variant="contained" color="primary" onClick={() => setEditarContra(true)} >
+                        Actualiza contraseña
+                    </Button>
+                </Grid>
+                <Grid item xs={3}></Grid>
+            </Grid>
+                                        
                                         </form>
                                     </div>
                                 </div>
@@ -465,22 +339,6 @@ const Configuracion = () => {
 
                             <div className="col-md-4 d-none">
                                 <div className="card-user card">
-                                    <div className="card-body">
-                                        <div className="author">
-                                            <Link to="/#" className="usuario-config">
-                                                <img alt="..." className="avatar border-gray" src={profile}></img>
-                                                <h5 className="title">{name} {last_name}</h5>
-                                            </Link>
-                                        </div>
-                                        <p></p>
-                                        <p className="description text-center">
-                                            "Descripcion
-                                            <br></br>Descripcion <br></br>Descripcion"
-                                        </p>
-                                        <p className="description text-center">Balance:</p>
-                                    </div>
-
-                                    <hr></hr>
 
                                     <div>
 
@@ -538,18 +396,7 @@ const Configuracion = () => {
                                                 <DialogContent>
                                                     <DialogContentText id="alert-dialog-description">
                                                         <div className="modal-body" style={{ width: 500 }} >
-                                                            <div className="col-md-12">
-                                                                <div className="form-group mt-0">
-                                                                    <TextField
-                                                                        style={{ width: '100%' }}
-                                                                        id="standard-multiline-flexible"
-                                                                        label="Correo Electronico"
-                                                                        maxRows={4}
-                                                                        value={email}
-                                                                        onChange={e => setEmail(e.target.value)}
-                                                                    />
-                                                                </div>
-                                                            </div>
+                                            
 
                                                             <div className="col-md-12">
                                                                 <div className="form-group">
@@ -660,7 +507,7 @@ const Configuracion = () => {
                                                     <Button onClick={() => setEditar(false)} color="primary">
                                                         Cancelar
                                                     </Button>
-                                                    <Button onClick={actualizarInformacion} color="primary" autoFocus>
+                                                    <Button  onClick={handleSubmitActualizar} color="primary" autoFocus>
                                                         Actualizar
                                                     </Button>
                                                 </DialogActions>
@@ -668,180 +515,6 @@ const Configuracion = () => {
                                         </div>
                                         {/* FIN MODAL EDITAR PERFIL */}
 
-
-
-
-
-
-
-
-
-                                        {/* Modal */}
-                                        <div style={{ marginTop: "5vh" }} className="modal fade d-none" id="exampleModal2" tabIndex={-1} role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                            <div className="modal-dialog" role="document">
-                                                <div className="modal-content">
-                                                    <div className="modal-header">
-                                                        <h5 className="modal-title" id="exampleModalLabel">Actualizar contraseña</h5>
-                                                        <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-                                                            <span aria-hidden="true">×</span>
-                                                        </button>
-                                                    </div>
-                                                    <div className="modal-body">
-                                                        <div className="form-group">
-                                                            <label>Contraseña anterior</label>
-                                                            <input placeholder="Contraseña" value={contraseña} onChange={(e) => setContraseña(e.target.value)} type="password" className="form-control" ></input>
-                                                        </div>
-                                                        <div className="form-group">
-                                                            <label>Contraseña nueva</label>
-                                                            <input placeholder="Contraseña nueva" value={contraseñaNueva} onChange={(e) => setContraseñaNueva(e.target.value)} type="password" className="form-control" ></input>
-                                                        </div>
-                                                        <div className="form-group">
-                                                            <label>Confirmar Contraseña</label>
-                                                            <input placeholder="Confirmar contraseña" value={confirmar} onChange={(e) => setConfirmar(e.target.value)} type="password" className="form-control"></input>
-                                                        </div>
-                                                    </div>
-                                                    <div className="modal-footer">
-                                                        <Button variant="contained" color="secondary" data-dismiss="modal">Cerrar</Button>
-                                                        <Button variant="contained" color="primary" onClick={actualizarContrasena} >Actualizar</Button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-
-                                        <div style={{ marginTop: "5vh" }} className="modal fade" id="exampleModal1" tabIndex={-1} role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                            <div className="modal-dialog" role="document">
-                                                <div className="modal-content">
-                                                    <div className="modal-header">
-                                                        <h5 className="modal-title" id="exampleModalLabel">Actualizar Perfil</h5>
-                                                        <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-                                                            <span aria-hidden="true">×</span>
-                                                        </button>
-                                                    </div>
-                                                    <div className="modal-body">
-                                                        <div className="col-md-12">
-                                                            <div className="form-group m-2 mt-0">
-                                                                <TextField
-                                                                    style={{ width: '100%' }}
-                                                                    id="standard-multiline-flexible"
-                                                                    label="Correo Electronico"
-                                                                    maxRows={4}
-                                                                    value={email}
-                                                                    onChange={e => setEmail(e.target.value)}
-                                                                />
-                                                            </div>
-                                                        </div>
-
-                                                        <div className="col-md-12">
-                                                            <div className="form-group m-2">
-                                                                <TextField
-                                                                    style={{ width: '100%' }}
-                                                                    id="standard-multiline-flexible"
-                                                                    label="Nombre"
-                                                                    maxRows={4}
-                                                                    value={name}
-                                                                    onChange={e => setName(e.target.value)}
-                                                                />
-                                                            </div>
-                                                        </div>
-
-                                                        <div className="col-md-12">
-                                                            <div className="form-group m-2">
-                                                                <TextField
-                                                                    style={{ width: '100%' }}
-                                                                    id="standard-multiline-flexible"
-                                                                    label="Apellido"
-                                                                    maxRows={4}
-                                                                    value={last_name}
-                                                                    onChange={e => setLastName(e.target.value)}
-                                                                />
-                                                            </div>
-                                                        </div>
-
-                                                        <div className="col-md-12">
-                                                            <div className="form-group m-2">
-                                                                <TextField
-                                                                    style={{ width: '100%' }}
-                                                                    id="standard-multiline-flexible"
-                                                                    label="Direccion"
-                                                                    maxRows={4}
-                                                                    value={direccion}
-                                                                    onChange={e => setDireccion(e.target.value)}
-                                                                />
-                                                            </div>
-                                                        </div>
-
-                                                        <div className="row">
-                                                            <div className="col-6" >
-                                                                <div className="form-group m-2">
-                                                                    <TextField
-                                                                        style={{ width: '100%' }}
-                                                                        id="standard-multiline-flexible"
-                                                                        label="Cuidad"
-                                                                        maxRows={4}
-                                                                        value={ciudad}
-                                                                        onChange={e => setCiudad(e.target.value)}
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                            <div className="col-6" >
-                                                                <div className="form-group m-2">
-                                                                    <TextField
-                                                                        style={{ width: '100%' }}
-                                                                        id="standard-multiline-flexible"
-                                                                        label="Pais"
-                                                                        maxRows={4}
-                                                                        value={pais}
-                                                                        onChange={e => setPais(e.target.value)}
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                            <div className="col-6" >
-                                                                <div className="form-group m-2">
-                                                                    <TextField
-                                                                        style={{ width: '100%' }}
-                                                                        id="standard-multiline-flexible"
-                                                                        label="Codigo postal"
-                                                                        maxRows={4}
-                                                                        value={codigoPostal}
-                                                                        onChange={e => setCodigoPostal(e.target.value)}
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                            <div className="col-6" >
-                                                                <div className="form-group m-2">
-                                                                    <TextField
-                                                                        style={{ width: '100%' }}
-                                                                        id="standard-multiline-flexible"
-                                                                        label="telefono"
-                                                                        maxRows={4}
-                                                                        value={telefono}
-                                                                        onChange={e => setTelefono(e.target.value)}
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                            <div className="col-md-12">
-                                                                <div className="form-group m-2">
-                                                                    <TextareaAutosize
-                                                                        onChange={e => setDescripccion(e.target.value)}
-                                                                        style={{ width: '100%', height: '100%' }}
-                                                                        aria-label="minimum height"
-                                                                        minRows={5}
-                                                                        value={descripccion}
-                                                                        placeholder="Descripcion perfil"
-
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="modal-footer">
-                                                        <button type="button" className="btn btn-sm btn-secondary" data-dismiss="modal">Cerrar</button>
-                                                        <button type="button" onClick={actualizarInformacion} className="btn btn-sm btn-primary">Actualizar</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>

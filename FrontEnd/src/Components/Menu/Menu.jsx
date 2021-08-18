@@ -115,9 +115,6 @@ export default function Menu() {
   const [email, setEmail] = useState('');
   const [avatares, setAvatares] = useState([])
 
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
 
   const obtenerDatos = async () => {
     await auth.onAuthStateChanged((z) => {
