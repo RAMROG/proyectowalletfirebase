@@ -130,10 +130,18 @@ const Estadistica = () => {
                 alert("error")
             }})
                 }
-
+                
+                const comprobarLog=async ()=>{
+                  auth.onIdTokenChanged(f=>{
+                    if(f){console.log("usuario logueado")}else{
+                      window.location="/login";
+                    }
+                  })
+                }
   
  
     useEffect(() => {
+      comprobarLog();
       obtenerPagos();
       obtenerCuentas();
     }, []);

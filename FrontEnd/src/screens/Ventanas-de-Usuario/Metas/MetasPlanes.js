@@ -236,7 +236,19 @@ const MetasPlanes = () => {
     const handleOpenMetas = () => {
         setOpenMetas(true);
     }
+
+    const comprobarLog=async ()=>{
+        auth.onIdTokenChanged(f=>{
+          if(f){console.log("usuario logueado")}else{
+            window.location="/login";
+          }
+        })
+      }
+
+
+
     useEffect(() => {
+        comprobarLog();
         obtenerMetas();
     }, [])
 

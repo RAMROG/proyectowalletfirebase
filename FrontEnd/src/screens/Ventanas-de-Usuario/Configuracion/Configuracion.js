@@ -117,31 +117,34 @@ const Configuracion = () => {
     /*falta implementacion dinamica en imput*/
     const handleSubmitActualizar = async (e) => {
         e.preventDefault();
-
-        const json_data = {
-            //id_user : idUsuario,
-            direccion: direccion,
-            telefono: telefono,
-            ciudad: ciudad,
-            pais: pais,
-            codigoPostal : codigoPostal,
-            descripccion:descripccion
-
-        };
-        try{
-            
-            await auth.onAuthStateChanged((z)=>{if(z){
-                database.ref(`/${z.uid}/informacion/`).set(json_data)
-                .then(e=>{
-                    let use=auth.currentUser;
-                    use.updateProfile({
-                    displayName:name+" "+last_name })
-                    setEditar(false)})
-                    }})
-                    .then()
-            }catch(e){
-               console.log(e);
-         }
+        if(name.length<3 || last_name.length<3 || pais.length<3 || ciudad.length<3 || codigoPostal.length<3){
+            alert("Nombre, apellido,pais y/o cuidad demasiado cortos(minimo 3 caracteres)")
+        }else{
+            const json_data = {
+                //id_user : idUsuario,
+                direccion: direccion,
+                telefono: telefono,
+                ciudad: ciudad,
+                pais: pais,
+                codigoPostal : codigoPostal,
+                descripccion:descripccion
+    
+            };
+            try{
+                
+                await auth.onAuthStateChanged((z)=>{if(z){
+                    database.ref(`/${z.uid}/informacion/`).set(json_data)
+                    .then(e=>{
+                        let use=auth.currentUser;
+                        use.updateProfile({
+                        displayName:name+" "+last_name })
+                        setEditar(false)})
+                        }})
+                        .then()
+                }catch(e){
+                   console.log(e);
+             }
+        }
     };
 
     const obtenerDatos = async () => {
@@ -175,9 +178,16 @@ const Configuracion = () => {
         }})
       }
 
-
+      const comprobarLog=async ()=>{
+        auth.onIdTokenChanged(f=>{
+          if(f){console.log("usuario logueado")}else{
+            window.location="/login";
+          }
+        })
+      }
 
     useEffect(() => {
+        comprobarLog();
         obtenerDatos();
     }, [])
 

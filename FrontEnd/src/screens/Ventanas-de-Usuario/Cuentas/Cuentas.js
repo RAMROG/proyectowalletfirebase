@@ -128,50 +128,79 @@ const Cuentas = () => {
     
     const handleSubmitCuentas = async (e) => {
         e.preventDefault();
-
-        const json_data = {
-            //id_user : idUsuario,
-            
-            name_bank_account : nombreBanco,
-            date_out: fechaVencimiento,
-            validation_digits: csv,
-            number_account: numeroCuenta,
-            mount: monto,
-            type_bank : tipoCuenta
-        };
-        try{
-            await auth.onAuthStateChanged((z)=>{if(z){
-                database.ref(`/${z.uid}/cuentas/`).push(json_data)
-                .then(setOpenModalCuentas(false))
-                    }})
-               
-            }catch(e){
-               
-                alert(e)
-                }
+        if(nombreBanco.trim() ==""  || fechaVencimiento.trim() == "" || monto.trim() == ""){
+            alert("No puede dejar campos vacios")
+        }else{
+            if(isNaN(numeroCuenta) || isNaN(monto)){
+                alert("los campos numero de cuenta y monto deben ser numeros")
+            }else{
+                const json_data = {
+                    //id_user : idUsuario,
+                    
+                    name_bank_account : nombreBanco,
+                    date_out: fechaVencimiento,
+                    validation_digits: csv,
+                    number_account: numeroCuenta,
+                    mount: monto,
+                    type_bank : tipoCuenta
+                };
+                try{
+                    await auth.onAuthStateChanged((z)=>{if(z){
+                        database.ref(`/${z.uid}/cuentas/`).push(json_data)
+                        .then(setOpenModalCuentas(false))
+                            }})
+                       
+                    }catch(e){
+                       
+                        alert(e)
+                        }
+            }
+        }
     };
 
     const handleSubmitPagos = async (e) => {
         e.preventDefault();
+        if(nombrePago.trim()=="" || descripcionPago.trim()==""){
+            alert("no se puede dejar campos vacios")
+        }else{
+            if(isNaN(montoPago)){
+                alert("el valor del monto debe ser un numero ")
+            }else{
+                const json_data = {
+                    //id_user : idUsuario,
+                    nombrePago : nombrePago,
+                    descripccion: descripcionPago,
+                    monto: montoPago,
+                    categoria: categoriaPago
+                };
+                try{
+                    await auth.onAuthStateChanged((z)=>{if(z){
+                        database.ref(`/${z.uid}/Pagos/`).push(json_data)
+                        .then(setOpenModalPagos(false))
+                            }})
+                       
+                    }catch(e){
+                       
+                        alert(e)
+                        }
 
-        const json_data = {
-            //id_user : idUsuario,
-            nombrePago : nombrePago,
-            descripccion: descripcionPago,
-            monto: montoPago,
-            categoria: categoriaPago
-        };
-        try{
-            await auth.onAuthStateChanged((z)=>{if(z){
-                database.ref(`/${z.uid}/Pagos/`).push(json_data)
-                .then(setOpenModalPagos(false))
-                    }})
-               
-            }catch(e){
-               
-                alert(e)
-                }
+            }
+        }
     };
+
+    const comprobarLog=async ()=>{
+        auth.onIdTokenChanged(f=>{
+          if(f){console.log("usuario logueado")}else{
+            window.location="/login";
+          }
+        })
+      }
+
+
+    useEffect(() => {
+    comprobarLog();
+    }, []);
+
 
     return (
         <div className={classes.root}>

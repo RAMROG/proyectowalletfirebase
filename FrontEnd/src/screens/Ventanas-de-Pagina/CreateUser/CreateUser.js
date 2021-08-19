@@ -66,6 +66,7 @@ export default function CreateUser() {
         if (email.trim() == "" || password.trim() == "" || name.trim() == ""  || last_name.trim() == "" ) {
           alert("No puede dejar campos vacios");
          }else{
+           if(name.length<=2 || last_name.length<=2){alert("el nombre y/o apellido deben tener una longitud minima de 3 caracteres")}else{
           await auth.createUserWithEmailAndPassword(email,password)
           .then(f=>{
             let use=auth.currentUser;
@@ -92,7 +93,7 @@ export default function CreateUser() {
               }
             }
           })
-         }
+         }}
     };
 
   return (
