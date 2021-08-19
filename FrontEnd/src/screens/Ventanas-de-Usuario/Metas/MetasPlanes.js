@@ -374,6 +374,7 @@ const MetasPlanes = () => {
                         label="Monto de la Meta"
                         style={{ marginTop: 8, width: '100%' }}
                         placeholder="Ingrese el monto de la meta"
+                        type="number"
                         fullWidth
                         margin="normal"
                         InputLabelProps={{

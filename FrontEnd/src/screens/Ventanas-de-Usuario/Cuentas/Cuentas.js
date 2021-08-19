@@ -16,7 +16,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import {auth,database} from '../../../firebaseconf';
+import { auth, database } from '../../../firebaseconf';
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -118,16 +118,18 @@ const Cuentas = () => {
     const [montoPago, setMontoPago] = useState("");
     const [descripcionPago, setDescripcionPago] = useState("");
     const [idCuenta, setIdCuenta] = useState("");
-    const [nombrePago,setNombrePago]=useState('');
-    const [categoriaPago,setCategoriaPago]=useState('');
+    const [nombrePago, setNombrePago] = useState('');
+    const [categoriaPago, setCategoriaPago] = useState('');
+    const [csvValido, setCsvValido] = useState(false);
 
 
     const [openModalPagos, setOpenModalPagos] = useState(false);
     const [openModalCuentas, setOpenModalCuentas] = useState(false);
 
-    
+
     const handleSubmitCuentas = async (e) => {
         e.preventDefault();
+<<<<<<< HEAD
         if(nombreBanco.trim() ==""  || fechaVencimiento.trim() == "" || monto.trim() == ""){
             alert("No puede dejar campos vacios")
         }else{
@@ -155,6 +157,29 @@ const Cuentas = () => {
                         alert(e)
                         }
             }
+=======
+
+        const json_data = {
+            //id_user : idUsuario,
+            name_bank_account: nombreBanco,
+            date_out: fechaVencimiento,
+            validation_digits: csv,
+            number_account: numeroCuenta,
+            mount: monto,
+            type_bank: tipoCuenta
+        };
+        try {
+            await auth.onAuthStateChanged((z) => {
+                if (z) {
+                    database.ref(`/${z.uid}/cuentas/`).push(json_data)
+                        .then(setOpenModalCuentas(false))
+                }
+            })
+
+        } catch (e) {
+
+            alert(e)
+>>>>>>> 9dff1dc82d0d1afcf219ec437f658b28ab39cd9a
         }
     };
 
@@ -184,9 +209,40 @@ const Cuentas = () => {
                         alert(e)
                         }
 
+<<<<<<< HEAD
             }
+=======
+        const json_data = {
+            //id_user : idUsuario,
+            nombrePago: nombrePago,
+            descripccion: descripcionPago,
+            monto: montoPago,
+            categoria: categoriaPago
+        };
+        try {
+            await auth.onAuthStateChanged((z) => {
+                if (z) {
+                    database.ref(`/${z.uid}/Pagos/`).push(json_data)
+                        .then(setOpenModalPagos(false))
+                }
+            })
+
+        } catch (e) {
+
+            alert(e)
+>>>>>>> 9dff1dc82d0d1afcf219ec437f658b28ab39cd9a
         }
     };
+    const handleChangeCsv = (csv) => {
+        if (String(csv).trim().length > 3) {
+            setCsvValido(true);
+        } else {
+            setCsvValido(false);
+        }
+
+        console.log(csv)
+    }
+
 
     const comprobarLog=async ()=>{
         auth.onIdTokenChanged(f=>{
@@ -309,7 +365,6 @@ const Cuentas = () => {
                                                         <div className="form-group">
                                                             <TextField
                                                                 id="datetime-local"
-                                                                label="Fecha vencimiento"
                                                                 type="date"
                                                                 style={{ width: 400 }}
                                                                 onChange={(e) => setFechaVencimiento(e.target.value)}
@@ -318,6 +373,7 @@ const Cuentas = () => {
                                                         <div className="form-group">
                                                             <TextField
                                                                 label="CSV"
+                                                                error={(csv.trim().length > 3) ? true : false}
                                                                 type="text"
                                                                 style={{ width: 400 }}
                                                                 onChange={(e) => setCsv(e.target.value)}
@@ -334,7 +390,7 @@ const Cuentas = () => {
                                                         <div className="form-group">
                                                             <TextField
                                                                 label="Monto"
-                                                                type="text"
+                                                                type="number"
                                                                 style={{ width: 400 }}
                                                                 onChange={(e) => setMonto(e.target.value)}
                                                             />
@@ -355,13 +411,12 @@ const Cuentas = () => {
                                                         </div>
                                                         <div className="form-group">
                                                             <TextField
-                                                                label="Fecha vencimiento"
                                                                 type="date"
                                                                 style={{ width: 400 }}
                                                                 onChange={(e) => setFechaVencimiento(e.target.value)}
                                                             />
                                                         </div>
-                                                        
+
                                                         <div className="form-group">
                                                             <TextField
                                                                 label="Numero de cuenta"
@@ -373,12 +428,12 @@ const Cuentas = () => {
                                                         <div className="form-group">
                                                             <TextField
                                                                 label="Monto"
-                                                                type="text"
+                                                                type="number"
                                                                 style={{ width: 400 }}
                                                                 onChange={(e) => setMonto(e.target.value)}
                                                             />
                                                         </div>
-                                                        
+
                                                     </>
                                                 }
                                                 {
@@ -395,7 +450,6 @@ const Cuentas = () => {
                                                         </div>
                                                         <div className="form-group">
                                                             <TextField
-                                                                label="Fecha vencimiento"
                                                                 type="date"
                                                                 style={{ width: 400 }}
                                                                 onChange={(e) => setFechaVencimiento(e.target.value)}
@@ -406,7 +460,7 @@ const Cuentas = () => {
                                                                 label="CSV"
                                                                 type="text"
                                                                 style={{ width: 400 }}
-                                                                onChange={(e) => setCsv(e.target.value)}
+                                                                onChange={(e) => handleChangeCsv(e.target.value)}
                                                             />
                                                         </div>
                                                         <div className="form-group">
@@ -420,12 +474,12 @@ const Cuentas = () => {
                                                         <div className="form-group">
                                                             <TextField
                                                                 label="Monto"
-                                                                type="text"
+                                                                type="number"
                                                                 style={{ width: 400 }}
                                                                 onChange={(e) => setMonto(e.target.value)}
                                                             />
                                                         </div>
-                                                        
+
                                                     </>
                                                 }
                                             </div>
@@ -474,7 +528,7 @@ const Cuentas = () => {
                                                 <div className="form-group">
                                                     <TextField
                                                         label="Monto"
-                                                        type="text"
+                                                        type="number"
                                                         style={{ width: 400 }}
                                                         onChange={e => setMontoPago(e.target.value)}
                                                     />
@@ -491,7 +545,7 @@ const Cuentas = () => {
                                                         <MenuItem key="1" value="Medicos">Medicos</MenuItem>
                                                         <MenuItem key="2" value="Servicios Publicos">Servicios Publicos</MenuItem>
                                                         <MenuItem key="3" value="Otros">Otros</MenuItem>
-                                                        
+
                                                     </TextField>
                                                 </div>
                                             </div>
@@ -501,7 +555,7 @@ const Cuentas = () => {
                                         <Button onClick={() => setOpenModalPagos(false)} color="primary">
                                             Cancelar
                                         </Button>
-                                        <Button  onClick={handleSubmitPagos} color="primary" autoFocus>
+                                        <Button onClick={handleSubmitPagos} color="primary" autoFocus>
                                             Agregar
                                         </Button>
                                     </DialogActions>
